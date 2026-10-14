@@ -1,0 +1,72 @@
+name: GCC build tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gcc-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    name: Prepare GCC sources
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Restore source downloads
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: work/downloads
+          key: gcc-sources-v1-${{ hashFiles('msys2/gcc-ref', 'msys2-cross/gcc-ref', 'mingw/gcc-ref') }}
+          restore-keys: gcc-sources-v1-
+
+      - name: Download missing sources
+        run: bash .github/scripts/prepare-sources.sh download
+
+      - name: Cache source downloads
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: work/downloads
+          key: ${{ steps.cache.outputs.cache-primary-key }}
+
+      - name: Apply common patches and archive sources
+        run: bash .github/scripts/prepare-sources.sh prepare
+
+      - name: Upload prepared sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: gcc-sources
+          path: work/sources/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  msys2:
+    needs: prepare
+    uses: ./.github/workflows/package.yml
+    with:
+      combination: msys2
+      environments: '["msys"]'
+
+  msys2-cross:
+    needs: prepare
+    uses: ./.github/workflows/package.yml
+    with:
+      combination: msys2-cross
+      environments: '["mingw32", "mingw64", "ucrt64"]'
+
+  mingw:
+    needs: prepare
+    uses: ./.github/workflows/package.yml
+    with:
+      combination: mingw
+      environments: '["mingw32", "mingw64", "ucrt64"]'

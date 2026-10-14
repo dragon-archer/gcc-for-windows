@@ -1,0 +1,109 @@
+diff -Nur gcc-13.4.0.orig/gcc/config/i386/cygwin-w64.h gcc-13.4.0/gcc/config/i386/cygwin-w64.h
+--- gcc-13.4.0.orig/gcc/config/i386/cygwin-w64.h	2025-06-13 19:42:18.595032400 +0200
++++ gcc-13.4.0/gcc/config/i386/cygwin-w64.h	2025-06-14 11:52:26.952239100 +0200
+@@ -45,8 +45,8 @@
+ 
+ #undef SUB_LINK_ENTRY32
+ #undef SUB_LINK_ENTRY64
+-#define SUB_LINK_ENTRY32 "-e __cygwin_dll_entry@12"
+-#define SUB_LINK_ENTRY64 "-e _cygwin_dll_entry"
++#define SUB_LINK_ENTRY32 "-e __msys_dll_entry@12"
++#define SUB_LINK_ENTRY64 "-e _msys_dll_entry"
+ 
+ #undef SUB_LINK_SPEC
+ #undef SUB_LINK_ENTRY
+@@ -66,7 +66,7 @@
+   %{static:-Bstatic} %{!static:-Bdynamic} \
+   %{shared|mdll: " SUB_LINK_ENTRY " --enable-auto-image-base} \
+   %(shared_libgcc_undefs) \
+-  --dll-search-prefix=cyg \
++  --dll-search-prefix=msys- \
+   %{rdynamic: --export-all-symbols} \
+   %{!shared: %{!mdll: %{" SPEC_32 ":--large-address-aware} --tsaware}}"
+ 
+@@ -82,4 +82,4 @@
+ #define PTRDIFF_TYPE (TARGET_64BIT ? "long int" : "int")
+ 
+ #undef LIBGCC_SONAME
+-#define LIBGCC_SONAME "cyggcc_s-seh-1.dll"
++#define LIBGCC_SONAME "msys-gcc_s-seh-1.dll"
+diff -Nur gcc-13.4.0.orig/gcc/config/i386/cygwin.h gcc-13.4.0/gcc/config/i386/cygwin.h
+--- gcc-13.4.0.orig/gcc/config/i386/cygwin.h	2025-06-13 19:42:18.764802800 +0200
++++ gcc-13.4.0/gcc/config/i386/cygwin.h	2025-06-14 11:52:04.360286400 +0200
+@@ -22,6 +22,7 @@
+   do								\
+     {								\
+       builtin_define ("__CYGWIN__");				\
++      builtin_define ("__MSYS__");				\
+       if (!TARGET_64BIT)					\
+ 	builtin_define ("__CYGWIN32__");			\
+       builtin_define_std ("unix");				\
+@@ -83,7 +84,7 @@
+ #define LIB_SPEC "\
+   %{pg:-lgmon} \
+   %{pthread: } \
+-  -lcygwin \
++  -lmsys-2.0 \
+   %{mwindows:-lgdi32 -lcomdlg32} \
+   %{fvtable-verify=preinit:-lvtv -lpsapi; \
+     fvtable-verify=std:-lvtv -lpsapi} \
+@@ -128,8 +129,8 @@
+   %{shared: %{mdll: %eshared and mdll are not compatible}} \
+   %{shared: --shared} %{mdll:--dll} \
+   %{static:-Bstatic} %{!static:-Bdynamic} \
+-  %{shared|mdll: --enable-auto-image-base -e __cygwin_dll_entry@12} \
+-  --dll-search-prefix=cyg \
++  %{shared|mdll: --enable-auto-image-base -e __msys_dll_entry@12} \
++  --dll-search-prefix=msys- \
+   %{rdynamic: --export-all-symbols} \
+   %{!shared: %{!mdll: --large-address-aware --tsaware}}"
+ 
+@@ -151,7 +152,7 @@
+ #else
+ #define LIBGCC_EH_EXTN "-sjlj"
+ #endif
+-#define LIBGCC_SONAME "cyggcc_s" LIBGCC_EH_EXTN "-1.dll"
++#define LIBGCC_SONAME "msys-gcc_s" LIBGCC_EH_EXTN "-1.dll"
+ 
+ /* Make stack executable to avoid DEP problems with trampolines.  */
+ #define HAVE_ENABLE_EXECUTE_STACK
+diff -Nur gcc-13.4.0.orig/gcc/config/i386/t-cygwin-w64 gcc-13.4.0/gcc/config/i386/t-cygwin-w64
+--- gcc-13.4.0.orig/gcc/config/i386/t-cygwin-w64	2025-06-05 18:02:58.000000000 +0200
++++ gcc-13.4.0/gcc/config/i386/t-cygwin-w64	2025-06-14 12:31:08.099855300 +0200
+@@ -0,0 +1,3 @@
++MULTILIB_OPTIONS = m64/m32
++MULTILIB_DIRNAMES = 64
++MULTILIB_OSDIRNAMES = ../lib ../lib32
+\ No newline at end of file
+diff -Nur gcc-13.4.0.orig/gcc/config.host gcc-13.4.0/gcc/config.host
+--- gcc-13.4.0.orig/gcc/config.host	2025-06-05 18:02:58.000000000 +0200
++++ gcc-13.4.0/gcc/config.host	2025-06-14 11:44:15.591776400 +0200
+@@ -228,7 +228,7 @@
+     out_host_hook_obj=host-cygwin.o
+     host_xmake_file="${host_xmake_file} i386/x-cygwin"
+     host_exeext=.exe
+-    host_lto_plugin_soname=cyglto_plugin.dll
++    host_lto_plugin_soname=msys-lto_plugin.dll
+     ;;
+   i[34567]86-*-mingw32* | x86_64-*-mingw*)
+     host_xm_file=i386/xm-mingw32.h
+diff -Nur gcc-13.4.0.orig/libgcc/config/i386/t-cygwin gcc-13.4.0/libgcc/config/i386/t-cygwin
+--- gcc-13.4.0.orig/libgcc/config/i386/t-cygwin	2025-06-05 18:03:02.000000000 +0200
++++ gcc-13.4.0/libgcc/config/i386/t-cygwin	2025-06-14 11:34:38.142763500 +0200
+@@ -5,14 +5,14 @@
+ 	-I$(srcdir)/../winsup/cygwin/include
+ 
+ # Cygwin-specific parts of LIB_SPEC
+-SHLIB_LC = -lcygwin -ladvapi32 -lshell32 -luser32 -lkernel32
++SHLIB_LC = -lmsys-2.0 -ladvapi32 -lshell32 -luser32 -lkernel32
+ 
+ # We have already included one of the t-{dw2,sjlj}-eh fragments for EH_MODEL
+ SHLIB_EH_EXTENSION = $(subst -dw2,,-$(EH_MODEL))
+ 
+ # Cygwin uses different conventions than MinGW; override generic SHLIB_ def'ns here.
+ SHLIB_IMPLIB = @shlib_base_name@$(SHLIB_EXT).a
+-SHLIB_SONAME = cyggcc_s$(SHLIB_EH_EXTENSION)-$(SHLIB_SOVERSION)$(SHLIB_EXT)
++SHLIB_SONAME = msys-gcc_s$(SHLIB_EH_EXTENSION)-$(SHLIB_SOVERSION)$(SHLIB_EXT)
+ # This must match the definitions of SHLIB_SONAME/SHLIB_SOVERSION and LIBGCC_SONAME.
+ # We'd like to use SHLIB_SONAME here too, and we can, since
+ # we don't rely on shlib_base_name substitution for it.

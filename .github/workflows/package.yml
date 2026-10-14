@@ -1,0 +1,77 @@
+name: Build GCC packages
+
+on:
+  workflow_call:
+    inputs:
+      combination:
+        type: string
+        required: true
+      environments:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ inputs.combination }} / ${{ matrix.environment }}
+    runs-on: windows-2022
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: ${{ fromJSON(inputs.environments) }}
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ inputs.combination == 'mingw' && matrix.environment || 'MSYS' }}
+          update: true
+          install: base-devel git
+
+      - name: Download prepared sources
+        uses: actions/download-artifact@v4
+        with:
+          name: gcc-sources
+          path: work/sources
+
+      - name: Prepare, build and package GCC
+        env:
+          COMBINATION: ${{ inputs.combination }}
+          ENVIRONMENT: ${{ matrix.environment }}
+        run: bash .github/scripts/build-package.sh "${COMBINATION}" "${ENVIRONMENT}"
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.combination }}-${{ matrix.environment }}-packages
+          path: artifacts/packages/*.pkg.tar.*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+      - name: Collect configure and test logs
+        if: always()
+        run: |
+          mkdir -p artifacts/logs
+          if [[ -d /c/gcc-build/src ]]; then
+            find /c/gcc-build/src -type f \( -name config.log -o -name '*.sum' -o -name '*.log' \) \
+              -print0 | tar --null -T - -czf artifacts/logs/build-diagnostics.tar.gz
+          fi
+
+      - name: Upload logs and effective recipe
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.combination }}-${{ matrix.environment }}-logs
+          path: artifacts/logs/
+          if-no-files-found: warn
+          retention-days: 14
