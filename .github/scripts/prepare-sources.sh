@@ -33,12 +33,14 @@ for combination in "${combinations[@]}"; do
       ;;
     prepare)
       if [[ -n ${prepared[${ref}]:-} ]]; then
+        echo "Reusing prepared sources: ${prepared[${ref}]} -> ${combination}"
         cp "${output_dir}/${prepared[${ref}]}.tar.xz" "${output_dir}/${combination}.tar.xz"
         cp "${output_dir}/${prepared[${ref}]}.env" "${output_dir}/${combination}.env"
         continue
       fi
       source_dir=${repo_root}/work/source-${combination}
       mkdir -p "${source_dir}"
+      echo "Extracting ${archive} for ${combination}"
       tar -xf "${cache_dir}/${archive}" --strip-components=1 -C "${source_dir}"
       read -r basever < "${source_dir}/gcc/BASE-VER"
       datestamp=$(< "${source_dir}/gcc/DATESTAMP")
@@ -54,9 +56,13 @@ for combination in "${combinations[@]}"; do
       mv "${source_dir}" "${archive_dir}/gcc-${pkgver}"
       printf 'GCC_PKGVER=%q\nGCC_BASEVER=%q\n' \
         "${pkgver}" "${basever}" > "${output_dir}/${combination}.env"
-      tar -cJf "${output_dir}/${combination}.tar.xz" -C "${archive_dir}" "gcc-${pkgver}"
+      echo "Compressing ${combination} sources with xz -T0 -1"
+      time tar -I 'xz -T0 -1' --checkpoint=10000 --checkpoint-action=echo \
+        -cf "${output_dir}/${combination}.tar.xz" -C "${archive_dir}" "gcc-${pkgver}"
+      echo "Archive complete; removing temporary sources for ${combination}"
       rm -rf "${archive_dir}"
       prepared[${ref}]=${combination}
+      echo "Prepared sources ready: ${combination}"
       ;;
     *) echo "Unknown mode: ${mode}" >&2; exit 2 ;;
   esac
