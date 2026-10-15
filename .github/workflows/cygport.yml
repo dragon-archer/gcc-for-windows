@@ -38,7 +38,7 @@ jobs:
             bison flex gperf texinfo python3 python3-devel
             libgmp-devel libmpfr-devel libmpc-devel libisl-devel
             zlib-devel libzstd-devel libiconv-devel libintl-devel
-            ${{ inputs.combination == 'cygwin' && 'gcc-ada' || 'mingw64-x86_64-binutils mingw64-x86_64-headers mingw64-x86_64-runtime mingw64-x86_64-winpthreads mingw64-x86_64-windows-default-manifest' }}
+            ${{ inputs.combination == 'cygwin' && 'gcc-ada=14.4.0-1' || 'mingw64-x86_64-binutils mingw64-x86_64-headers mingw64-x86_64-runtime mingw64-x86_64-winpthreads mingw64-x86_64-windows-default-manifest' }}
 
       - name: Download prepared sources
         uses: actions/download-artifact@v4
