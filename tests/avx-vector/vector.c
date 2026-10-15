@@ -1,5 +1,9 @@
+/* Regression scenario: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54412
+    Vector-by-value smoke test; related GCC testcase:
+    gcc.target/i386/pr54412-m256-byval-param.c. */
 typedef double vector4 __attribute__((vector_size(32), aligned(32)));
 
+__attribute__((noipa))
 static vector4 pass_vector(vector4 value)
 {
     return value;
