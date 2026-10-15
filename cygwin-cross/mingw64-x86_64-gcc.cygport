@@ -58,6 +58,7 @@ mingw64_x86_64_gcc_core_CONTENTS="
 	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libquadmath.*
 	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libssp*
 	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/lto*.exe
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/testsuite
 	usr/share/doc/
 	usr/share/man/man1/${TOOLCHAIN_TARGET}-cpp.1*
 	usr/share/man/man1/${TOOLCHAIN_TARGET}-gcc.1*
