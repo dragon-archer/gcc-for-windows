@@ -64,8 +64,7 @@ else
   _sourcedir=gcc-${_version}-${_snapshot}
   _url=https://gcc.gnu.org/pub/gcc/snapshots/${_version}-${_snapshot}
 fi
-_gcc_basever=${pkgver}
-_libdir=lib/gcc/${CHOST}/${_gcc_basever}
+_libdir=lib/gcc/${CHOST}/${_pkgver}
 pkgrel=6
 pkgdesc="The GNU Compiler Collection (mingw-w64)"
 arch=('any')
@@ -501,10 +500,10 @@ package_gcc() {
 
   # install "custom" system gdbinit
   install -Dm644 "${srcdir}"/gdbinit "${pkgdir}"${MINGW_PREFIX}/etc/gdbinit
-  sed -i 's|%GCC_NAME%|gcc-'${_gcc_basever}'|g' "${pkgdir}"${MINGW_PREFIX}/etc/gdbinit
+  sed -i 's|%GCC_NAME%|gcc-'${_pkgver}'|g' "${pkgdir}"${MINGW_PREFIX}/etc/gdbinit
 
   # byte-compile python libraries
-  python -m compileall -o 0 -o 1 "${pkgdir}"${MINGW_PREFIX}/share/gcc-${_gcc_basever}/
+  python -m compileall -o 0 -o 1 "${pkgdir}"${MINGW_PREFIX}/share/gcc-${_pkgver}/
 
   _install_RLE
 }

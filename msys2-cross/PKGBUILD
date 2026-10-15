@@ -5,9 +5,9 @@ _mingw_suff=mingw-w64-cross
 pkgbase="${_mingw_suff}-${_realname}"
 _targetpkgs=("${_mingw_suff}-ucrt64-${_realname}" "${_mingw_suff}-mingw32-${_realname}" "${_mingw_suff}-mingw64-${_realname}")
 pkgname=("${_mingw_suff}-${_realname}" "${_targetpkgs[@]}")
-pkgver=16.2.0
+_pkgver=16.2.0
+pkgver=${_pkgver}
 pkgrel=1
-_gcc_basever=${pkgver}
 pkgdesc="Cross GCC for the MinGW-w64"
 arch=('i686' 'x86_64')
 url="https://gcc.gnu.org"
@@ -168,12 +168,12 @@ _package() {
   _target=$1
   cd ${srcdir}/gcc-build-${_target}
   make -j1 DESTDIR=${pkgdir} install
-  mv ${pkgdir}/opt/lib/gcc/${_target}/lib/libgcc_s.a ${pkgdir}/opt/lib/gcc/${_target}/${_gcc_basever}/
-  mv ${pkgdir}/opt/lib/gcc/${_target}/libgcc*.dll ${pkgdir}/opt/lib/gcc/${_target}/${_gcc_basever}/
+  mv ${pkgdir}/opt/lib/gcc/${_target}/lib/libgcc_s.a ${pkgdir}/opt/lib/gcc/${_target}/${_pkgver}/
+  mv ${pkgdir}/opt/lib/gcc/${_target}/libgcc*.dll ${pkgdir}/opt/lib/gcc/${_target}/${_pkgver}/
   for _f in ${pkgdir}/opt/bin/*.exe; do
     strip -s ${_f}
   done
-  for _f in ${pkgdir}/opt/lib/gcc/${_target}/${_gcc_basever}/*.exe; do
+  for _f in ${pkgdir}/opt/lib/gcc/${_target}/${_pkgver}/*.exe; do
     strip -s ${_f}
   done
   rm -rf ${pkgdir}/opt/share

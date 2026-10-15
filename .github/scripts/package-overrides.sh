@@ -1,12 +1,12 @@
 pkgver=${GCC_PKGVER}
 pkgrel=1
-_gcc_basever=${GCC_BASEVER}
+_pkgver=${GCC_BASEVER}
 
 if [[ ${GCC_COMBINATION} == mingw ]]; then
   source=("gcc-${GCC_PKGVER}.tar.xz" "${source[@]:2}")
   sha256sums=(SKIP "${sha256sums[@]:2}")
   _sourcedir=gcc-${pkgver}
-  _libdir=lib/gcc/${CHOST}/${_gcc_basever}
+  _libdir=lib/gcc/${CHOST}/${_pkgver}
 else
   source=("gcc-${GCC_PKGVER}.tar.xz" "${source[@]:1}")
   sha256sums=(SKIP "${sha256sums[@]:1}")

@@ -9,9 +9,9 @@ pkgname=('gcc' 'gcc-libs')
 # NOTE: gdb must be rebuilt with each new gcc version.
 # NOTE: libtool must be rebuilt with each new gcc version.
 # FIXME: run compileall on /usr/share/gcc-${pkgver}/python/libstdcxx on the next version update
-pkgver=15.3.0
+_pkgver=15.3.0
+pkgver=${_pkgver}
 pkgrel=2
-_gcc_basever=${pkgver}
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('spdx:GPL-3.0-or-later WITH GCC-exception-3.1 AND GFDL-1.3-or-later')
@@ -221,7 +221,7 @@ package_gcc-libs() {
 
   rm -vf ${pkgdir}/*.dll
   rm -rvf ${pkgdir}/usr/lib/
-  rm -rvf ${pkgdir}/usr/share/gcc-${_gcc_basever}
+  rm -rvf ${pkgdir}/usr/share/gcc-${_pkgver}
 
   # Install GPL-3 + Runtime Library Exception + LGPL-2.1
   install -Dm644 "${srcdir}/gcc-${pkgver}/COPYING3" "${pkgdir}/usr/share/licenses/gcc-libs/COPYING3"
