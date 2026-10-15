@@ -72,7 +72,7 @@ for hf in ${HOTFIXES} ; do
 "
 done
 #
-#DISABLE_BOOTSTRAP=1
+DISABLE_BOOTSTRAP=1
 defined DISABLE_BOOTSTRAP &&
     inform "Disable Bootstrapping."
 #DISABLE_LIBGCCJIT=1
