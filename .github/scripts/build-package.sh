@@ -20,7 +20,9 @@ case ${GCC_COMBINATION}:${GCC_ENVIRONMENT} in
   *) echo 'Unsupported build combination/environment.' >&2; exit 1 ;;
 esac
 
-build_dir=/c/gcc-build
+msys_root=$(cygpath -m /)
+build_dir=$(cygpath -u "${msys_root%%/*}/gcc-build")
+echo "Building in ${build_dir}; MSYS2 root: ${msys_root}"
 export PKGDEST=${repo_root}/artifacts/packages
 export LOGDEST=${repo_root}/artifacts/logs
 mkdir -p "${build_dir}" "${PKGDEST}" "${LOGDEST}"
