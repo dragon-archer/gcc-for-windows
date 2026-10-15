@@ -54,11 +54,10 @@ for combination in "${combinations[@]}"; do
       archive_dir=${repo_root}/work/archive-${combination}
       mkdir -p "${archive_dir}"
       mv "${source_dir}" "${archive_dir}/gcc-${pkgver}"
-      rm -rf "${archive_dir}/gcc-${pkgver}/.github"
       printf 'GCC_PKGVER=%q\nGCC_BASEVER=%q\n' \
         "${pkgver}" "${basever}" > "${output_dir}/${combination}.env"
       echo "Compressing ${combination} sources with xz -T0 -1"
-      time tar -I 'xz -T0 -1' --checkpoint=10000 --checkpoint-action=echo \
+      tar --dereference -I 'xz -T0 -1' \
         -cf "${output_dir}/${combination}.tar.xz" -C "${archive_dir}" "gcc-${pkgver}"
       echo "Archive complete; removing temporary sources for ${combination}"
       rm -rf "${archive_dir}"
