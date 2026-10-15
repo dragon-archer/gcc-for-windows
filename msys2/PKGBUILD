@@ -155,6 +155,7 @@ build() {
   export MSYSTEM=CYGWIN
 
   ../gcc-${pkgver}/configure \
+    --disable-werror \
     --build=${CHOST} \
     --prefix=/usr \
     --libexecdir=/usr/lib \
