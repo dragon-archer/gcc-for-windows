@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   build:
-    name: ${{ inputs.combination }} / ${{ matrix.environment }}
+    name: ${{ matrix.environment }}
     runs-on: windows-2022
     timeout-minutes: 360
     strategy:
@@ -33,7 +33,7 @@ jobs:
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
         with:
-          msystem: ${{ inputs.combination == 'mingw' && matrix.environment || 'MSYS' }}
+          msystem: ${{ matrix.environment }}
           update: true
           install: base-devel git
 
@@ -62,8 +62,10 @@ jobs:
         if: always()
         run: |
           mkdir -p artifacts/logs
-          if [[ -d /c/gcc-build/src ]]; then
-            find /c/gcc-build/src -type f \( -name config.log -o -name '*.sum' -o -name '*.log' \) \
+          msys_root=$(cygpath -m /)
+          build_dir=$(cygpath -u "${msys_root%%/*}/gcc-build")
+          if [[ -d ${build_dir}/src ]]; then
+            find "${build_dir}/src" -type f \( -name config.log -o -name '*.sum' -o -name '*.log' \) \
               -print0 | tar --null -T - -czf artifacts/logs/build-diagnostics.tar.gz
           fi
 
