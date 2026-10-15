@@ -51,7 +51,7 @@ mingw64_x86_64_gcc_core_CONTENTS="
 	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/include-fixed/
 	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/include/
 	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/install-tools/
-	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libatomic.*
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libatomic*
 	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libgcc*
 	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libgcov.*
 	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libgomp*
@@ -90,7 +90,7 @@ mingw64_x86_64_gcc_fortran_CONTENTS="
 	usr/bin/${TOOLCHAIN_TARGET}-gfortran.exe
 	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/f951.exe
 	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/finclude/
-	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libcaf_single.*
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libcaf_{shmem,single}.*
 	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libgfortran*
 	usr/share/man/man1/${TOOLCHAIN_TARGET}-gfortran.1*
 	${TOOLCHAIN_SYSROOT#/}/mingw/bin/libgfortran-*.dll
