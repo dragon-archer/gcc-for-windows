@@ -11,13 +11,24 @@ in a single CI pipeline, using recipes from MSYS2 and Cygwin.
 
 ## Supported Builds
 
-| Combination | Host environment | Compiler target | Packaging tool |
-| --- | --- | --- | --- |
-| [msys2](msys2/) | MSYS2 | Native MSYS2 | `makepkg` |
-| [msys2-cross](msys2-cross/) | MSYS2 | MinGW-w64: mingw32, mingw64, ucrt64 | `makepkg` |
-| [mingw](mingw/) | MINGW32, MINGW64, UCRT64 | Native MinGW-w64 in each environment | `makepkg-mingw` |
-| [cygwin](cygwin/) | Cygwin x86_64 | Native Cygwin | `cygport` |
-| [cygwin-cross](cygwin-cross/) | Cygwin x86_64 | `x86_64-w64-mingw32` | `cygport` |
+| Combination | Host environment | Compiler target | Packaging tool | Status |
+| --- | --- | --- | --- | --- |
+| [msys2](msys2/) | MSYS2 | Native MSYS2 | `makepkg` | [![MSYS2][status-msys2]][ci] |
+| [msys2-cross](msys2-cross/) | MSYS2 | MinGW-w64: mingw32, mingw64, ucrt64 | `makepkg` | [![MINGW32][status-msys2-cross-mingw32]][ci] [![MINGW64][status-msys2-cross-mingw64]][ci] [![UCRT64][status-msys2-cross-ucrt64]][ci] |
+| [mingw](mingw/) | MINGW32, MINGW64, UCRT64 | Native MinGW-w64 in each environment | `makepkg-mingw` | [![MINGW32][status-mingw-mingw32]][ci] [![MINGW64][status-mingw-mingw64]][ci] [![UCRT64][status-mingw-ucrt64]][ci] |
+| [cygwin](cygwin/) | Cygwin x86_64 | Native Cygwin | `cygport` | [![Cygwin][status-cygwin]][ci] |
+| [cygwin-cross](cygwin-cross/) | Cygwin x86_64 | `x86_64-w64-mingw32` | `cygport` | [![Win64][status-cygwin-cross]][ci] |
+
+[ci]: https://github.com/dragon-archer/gcc-for-windows/actions/workflows/build.yml?query=branch%3Amain
+[status-msys2]: https://badgen.net/github/checks/dragon-archer/gcc-for-windows/main/msys2%20%2F%20msys?label=MSYS2
+[status-msys2-cross-mingw32]: https://badgen.net/github/checks/dragon-archer/gcc-for-windows/main/msys2-cross%20%2F%20mingw32?label=MINGW32
+[status-msys2-cross-mingw64]: https://badgen.net/github/checks/dragon-archer/gcc-for-windows/main/msys2-cross%20%2F%20mingw64?label=MINGW64
+[status-msys2-cross-ucrt64]: https://badgen.net/github/checks/dragon-archer/gcc-for-windows/main/msys2-cross%20%2F%20ucrt64?label=UCRT64
+[status-mingw-mingw32]: https://badgen.net/github/checks/dragon-archer/gcc-for-windows/main/mingw%20%2F%20mingw32?label=MINGW32
+[status-mingw-mingw64]: https://badgen.net/github/checks/dragon-archer/gcc-for-windows/main/mingw%20%2F%20mingw64?label=MINGW64
+[status-mingw-ucrt64]: https://badgen.net/github/checks/dragon-archer/gcc-for-windows/main/mingw%20%2F%20ucrt64?label=UCRT64
+[status-cygwin]: https://badgen.net/github/checks/dragon-archer/gcc-for-windows/main/cygwin%20%2F%20cygwin?label=Cygwin
+[status-cygwin-cross]: https://badgen.net/github/checks/dragon-archer/gcc-for-windows/main/cygwin-cross%20%2F%20cygwin-cross?label=Win64
 
 These combinations run as nine parallel build jobs.
 
