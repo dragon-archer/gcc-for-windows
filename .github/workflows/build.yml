@@ -21,7 +21,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: work/downloads
-          key: gcc-sources-v1-${{ hashFiles('msys2/gcc-ref', 'msys2-cross/gcc-ref', 'mingw/gcc-ref') }}
+          key: gcc-sources-v1-${{ hashFiles('*/gcc-ref') }}
           restore-keys: gcc-sources-v1-
 
       - name: Download missing sources
@@ -48,21 +48,33 @@ jobs:
 
   msys2:
     needs: prepare
-    uses: ./.github/workflows/package.yml
+    uses: ./.github/workflows/makepkg.yml
     with:
       combination: msys2
       environments: '["msys"]'
 
   msys2-cross:
     needs: prepare
-    uses: ./.github/workflows/package.yml
+    uses: ./.github/workflows/makepkg.yml
     with:
       combination: msys2-cross
       environments: '["mingw32", "mingw64", "ucrt64"]'
 
   mingw:
     needs: prepare
-    uses: ./.github/workflows/package.yml
+    uses: ./.github/workflows/makepkg.yml
     with:
       combination: mingw
       environments: '["mingw32", "mingw64", "ucrt64"]'
+
+  cygwin:
+    needs: prepare
+    uses: ./.github/workflows/cygport.yml
+    with:
+      combination: cygwin
+
+  cygwin-cross:
+    needs: prepare
+    uses: ./.github/workflows/cygport.yml
+    with:
+      combination: cygwin-cross

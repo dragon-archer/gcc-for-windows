@@ -47,7 +47,7 @@ jobs:
         env:
           COMBINATION: ${{ inputs.combination }}
           ENVIRONMENT: ${{ matrix.environment }}
-        run: bash .github/scripts/build-package.sh "${COMBINATION}" "${ENVIRONMENT}"
+        run: bash .github/scripts/build-makepkg.sh "${COMBINATION}" "${ENVIRONMENT}"
 
       - name: Upload packages
         uses: actions/upload-artifact@v4

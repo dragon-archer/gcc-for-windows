@@ -1,0 +1,24 @@
+--- gcc/config/i386/xmmintrin.h.orig
++++ gcc/config/i386/xmmintrin.h
+@@ -67,6 +67,10 @@
+ #define __DISABLE_SSE__
+ #endif /* __SSE__ */
+ 
++#ifdef __cplusplus
++extern "C" {
++#endif
++
+ /* The Intel API is flexible enough that we must allow aliasing with other
+    vector types, and their scalar components.  */
+ typedef float __m128 __attribute__ ((__vector_size__ (16), __may_alias__));
+@@ -1318,6 +1322,10 @@
+   (row3) = __builtin_ia32_movhlps (__t3, __t2);				\
+ } while (0)
+ 
++#ifdef __cplusplus
++}
++#endif
++
+ /* For backward source compatibility.  */
+ # include <emmintrin.h>
+ 

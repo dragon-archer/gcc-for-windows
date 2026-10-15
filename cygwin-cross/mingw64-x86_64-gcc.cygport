@@ -1,0 +1,197 @@
+# -*- mode: sh; sh-shell: bash -*-
+BUILD_REQUIRES=""
+TOOLCHAIN_TARGET="x86_64-w64-mingw32"
+inherit toolchain
+
+ORIG_NAME="gcc"
+NAME="mingw64-x86_64-gcc"
+VERSION="14.4.0"
+RELEASE="1"
+CATEGORY="Devel"
+SUMMARY="GCC for Win64 toolchain"
+DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
+Objective-C, and Fortran as well as libraries for these languages
+(libstdc++, libgcj,...)."
+HOMEPAGE="https://mingw-w64.org/"
+LICENSE="GPL-3.0-or-later"
+PVmaj=${PV%%.*}
+case ${PV} in
+*.*-20[1-9][0-9][0-1][0-9][0-3][0-9])
+	SRC_URI="mirror://gcc/snapshots/${PV}/${ORIG_NAME}-${PV}.tar.xz" ;;
+*)	SRC_URI="mirror://gnu/gcc/${ORIG_NAME}-${PV}/${ORIG_NAME}-${PV}.tar.xz" ;;
+esac
+SRC_DIR="${ORIG_NAME}-${PV}"
+
+PATCH_URI="
+	${ORIG_NAME}-bug-56742-seh-uncaught-throw.patch
+	${ORIG_NAME}-make-xmmintrin-header-cplusplus-compatible.patch
+	0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
+	libgfortran-linking-fixup.patch
+"
+
+# CI hints
+SCALLYWAG="nobuild notest nodeploy"
+
+PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-objc"
+mingw64_x86_64_gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
+mingw64_x86_64_gcc_core_REQUIRES="mingw64-x86_64-binutils mingw64-x86_64-winpthreads mingw64-x86_64-runtime mingw64-x86_64-windows-default-manifest"
+mingw64_x86_64_gcc_core_OBSOLETES="${NAME}-ada"
+mingw64_x86_64_gcc_core_CONTENTS="
+	--exclude=c++ --exclude=objc --exclude=gcj --exclude=jni*.h
+	usr/bin/${TOOLCHAIN_TARGET}-cpp.exe
+	usr/bin/${TOOLCHAIN_TARGET}-gcc.exe
+	usr/bin/${TOOLCHAIN_TARGET}-gcc-*.exe
+	usr/bin/${TOOLCHAIN_TARGET}-gcov.exe
+	usr/bin/${TOOLCHAIN_TARGET}-gcov-*.exe
+	usr/bin/${TOOLCHAIN_TARGET}-lto-*.exe
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/cc1.exe
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/collect2.exe
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/crt*.o
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/*lto_plugin*
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/include-fixed/
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/include/
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/install-tools/
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libatomic.*
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libgcc*
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libgcov.*
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libgomp*
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libquadmath.*
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libssp*
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/lto*.exe
+	usr/share/doc/
+	usr/share/man/man1/${TOOLCHAIN_TARGET}-cpp.1*
+	usr/share/man/man1/${TOOLCHAIN_TARGET}-gcc.1*
+	usr/share/man/man1/${TOOLCHAIN_TARGET}-gcov.1*
+	usr/share/man/man1/${TOOLCHAIN_TARGET}-gcov-*.1*
+	usr/share/man/man1/${TOOLCHAIN_TARGET}-lto-*.1*
+	${TOOLCHAIN_SYSROOT#/}/mingw/bin/libatomic-1.dll
+	${TOOLCHAIN_SYSROOT#/}/mingw/bin/libgcc_s_seh-1.dll
+	${TOOLCHAIN_SYSROOT#/}/mingw/bin/libgomp*.dll
+	${TOOLCHAIN_SYSROOT#/}/mingw/bin/libquadmath-0.dll
+	${TOOLCHAIN_SYSROOT#/}/mingw/bin/libssp-0.dll
+"
+mingw64_x86_64_gcc_g___SUMMARY="${SUMMARY} (C++)"
+mingw64_x86_64_gcc_g___REQUIRES="${NAME}-core"
+mingw64_x86_64_gcc_g___CONTENTS="
+	--exclude=gcj --exclude=gnu --exclude=java --exclude=javax --exclude=org --exclude=sun
+	usr/bin/${TOOLCHAIN_TARGET}-c++.exe
+	usr/bin/${TOOLCHAIN_TARGET}-g++.exe
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/cc1plus.exe
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/g++-mapper-server.exe
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/include/c++/
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libstdc++*
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libsupc++.*
+	usr/share/man/man1/${TOOLCHAIN_TARGET}-g++.1*
+	${TOOLCHAIN_SYSROOT#/}/mingw/bin/libstdc++-6.dll
+"
+mingw64_x86_64_gcc_fortran_SUMMARY="${SUMMARY} (Fortran)"
+mingw64_x86_64_gcc_fortran_REQUIRES="${NAME}-core"
+mingw64_x86_64_gcc_fortran_CONTENTS="
+	usr/bin/${TOOLCHAIN_TARGET}-gfortran.exe
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/f951.exe
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/finclude/
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libcaf_single.*
+	usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libgfortran*
+	usr/share/man/man1/${TOOLCHAIN_TARGET}-gfortran.1*
+	${TOOLCHAIN_SYSROOT#/}/mingw/bin/libgfortran-*.dll
+"
+
+mingw64_x86_64_gcc_objc_SUMMARY="${SUMMARY} (Objective-C,C++)"
+mingw64_x86_64_gcc_objc_REQUIRES="${NAME}-core"
+mingw64_x86_64_gcc_objc_CONTENTS="
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/include/objc/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/cc1obj.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/libobjc.*
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/cc1objplus.exe \
+    usr/${TOOLCHAIN_TARGET}/sys-root/mingw/bin/libobjc-*.dll
+"
+
+mingw64_x86_64_gcc_ada_SUMMARY="${SUMMARY} (Ada)"
+mingw64_x86_64_gcc_ada_REQUIRES="${NAME}-core"
+mingw64_x86_64_gcc_ada_CONTENTS="
+    usr/bin/${TOOLCHAIN_TARGET}-gnat.exe \
+    usr/bin/${TOOLCHAIN_TARGET}-gnatbind.exe \
+    usr/bin/${TOOLCHAIN_TARGET}-gnatchop.exe \
+    usr/bin/${TOOLCHAIN_TARGET}-gnatclean.exe \
+    usr/bin/${TOOLCHAIN_TARGET}-gnatfind.exe \
+    usr/bin/${TOOLCHAIN_TARGET}-gnatkr.exe \
+    usr/bin/${TOOLCHAIN_TARGET}-gnatlink.exe \
+    usr/bin/${TOOLCHAIN_TARGET}-gnatls.exe \
+    usr/bin/${TOOLCHAIN_TARGET}-gnatmake.exe \
+    usr/bin/${TOOLCHAIN_TARGET}-gnatname.exe \
+    usr/bin/${TOOLCHAIN_TARGET}-gnatprep.exe \
+    usr/bin/${TOOLCHAIN_TARGET}-gnatxref.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/adainclude \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/adalib \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/gnat1.exe \
+"
+
+CYGCONF_ARGS="
+	--disable-multilib
+	--disable-win32-registry
+	--enable-languages=c,c++,fortran,lto,objc,obj-c++
+	--enable-fully-dynamic-string
+	--enable-graphite
+	--enable-libgomp
+	--enable-libquadmath
+	--enable-libquadmath-support
+	--enable-libssp
+	--enable-version-specific-runtime-libs
+	--enable-libgomp
+	--enable-libada
+	--with-dwarf2
+	--with-gcc-major-version-only
+	--with-gnu-ld --with-gnu-as
+	--with-tune=generic
+	--with-cloog-include=/usr/include/cloog-isl
+	--with-system-zlib
+	--enable-threads=posix
+	--libexecdir=/usr/lib
+"
+# --enable-libstdcxx-filesystem-ts
+# --enable-vtable-verify
+
+src_install() {
+	cd ${B}
+	cyginstall -j1
+
+	# Remove Cygwin-host libiberty.a
+	rm -f ${D}/usr/lib/libiberty.a
+
+	# Workaround GCC install bug
+	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/lib/libgcc_s.a ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/
+#	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/lib32/libgcc_s.a ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${PVmaj}/32/
+
+	dodir ${TOOLCHAIN_SYSROOT}/mingw/bin
+	mv $(find ${D}/ -name 'libgcc_s*.dll') ${D}${TOOLCHAIN_SYSROOT}/mingw/bin
+
+	# conflicts with native gcc
+	rm -fr ${D}/usr/share/{gcc-*,info,locale,man/man7}
+}
+
+src_compile() {
+        ___CFLAGS=`echo ${CFLAGS} | sed s/-Werror=format-security/-Wno-format-security/g`
+        ___CFLAGS=`echo ${___CFLAGS} | sed s/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g`
+	___CFLAGS=`echo ${___CFLAGS} | sed 's/-Werror/-Wno-error/g'`
+        ___CFLAGS=`echo ${___CFLAGS} | sed 's/[[:blank:]]\+/ /g'`
+
+        ___CXXFLAGS=`echo ${CXXFLAGS} | sed s/-Werror=format-security/-Wformat-security/g`
+        ___CXXFLAGS=`echo ${___CXXFLAGS} | sed s/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g`
+	___CXXFLAGS=`echo ${___CXXFLAGS} | sed 's/-Werror/-Wno-error/g'`
+        ___CXXFLAGS=`echo ${___CXXFLAGS} | sed 's/[[:blank:]]\+/ /g'`
+
+	__FCFLAGS=`echo ${FCFLAGS} | sed s/-Werror=format-security//g`
+	__FCFLAGS=`echo ${__FCFLAGS} | sed s/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g`
+	__FCFLAGS=`echo ${__FCFLAGS} | sed 's/-Werror/-Wno-error/g'`
+	__FCFLAGS=`echo ${__FCFLAGS} | sed 's/[[:blank:]]\+/ /g'`
+
+        export CFLAGS=${___CFLAGS}
+        export CXXFLAGS=${___CXXFLAGS}
+	export FCFLAGS=${__FCFLAGS}
+	export HOST_CFLAGS=${___CFLAGS}
+	export HOST_CXXFLAGS=${___CXXFLAGS}
+	export HOST_FCFLAGS=${__FCFLAGS}
+
+	cd ${B}
+	toolchain_compile
+}

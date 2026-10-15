@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+[[ ${GITHUB_ACTIONS:-} == true ]] || { echo 'This script is CI-only.' >&2; exit 1; }
+[[ $(uname -s) == CYGWIN* ]] || { echo 'Cygwin is required.' >&2; exit 1; }
+combination=${1:?combination is required}
+case ${combination} in
+  cygwin) recipe=gcc.cygport ;;
+  cygwin-cross) recipe=mingw64-x86_64-gcc.cygport ;;
+  *) exit 2 ;;
+esac
+
+repo_root=$(pwd)
+source "${repo_root}/work/sources/${combination}.env"
+build_dir=/gcc-build
+mkdir -p "${build_dir}" "${repo_root}/artifacts/logs"
+cp -a "${repo_root}/${combination}/." "${build_dir}/"
+cp "${repo_root}/work/sources/${combination}.tar.xz" "${build_dir}/gcc-${GCC_PKGVER}.tar.xz"
+cd "${build_dir}"
+sed -i "s/^VERSION=.*/VERSION=\"${GCC_PKGVER}\"/" "${recipe}"
+printf '\nSRC_URI="gcc-${PV}.tar.xz"\nSRC_DIR="gcc-${PV}"\n' >> "${recipe}"
+cp "${recipe}" "${repo_root}/artifacts/logs/"
+cp "${repo_root}/work/sources/${combination}.env" "${repo_root}/artifacts/logs/source.env"
+cygport "${recipe}" prep compile install package
+mkdir -p "${repo_root}/artifacts/packages"
+for dist_dir in "${build_dir}/"*.x86_64/dist; do
+  cp -a "${dist_dir}/." "${repo_root}/artifacts/packages/"
+done

@@ -1,0 +1,27 @@
+From 59c7bae2ca8f135c2d9f608a025fc740407a715b Mon Sep 17 00:00:00 2001
+From: Achim Gratz <Achim.Gratz@Stromeko.DE>
+Date: Sun, 20 Oct 2024 16:52:06 +0200
+Subject: [PATCH 302/302] newlib locale: stage1 now depends on libintl /
+ libiconv
+
+---
+ gcc/Makefile.in | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gcc/Makefile.in b/gcc/Makefile.in
+index 8ecef4ccdc7..c72b1c7f4e5 100644
+--- a/gcc/Makefile.in
++++ b/gcc/Makefile.in
+@@ -3419,7 +3419,8 @@ gengtype$(exeext) : gengtype.o gengtype-lex.o gengtype-parse.o \
+ # Rule for the generator programs:
+ $(genprog:%=build/gen%$(build_exeext)): build/gen%$(build_exeext): build/gen%.o $(BUILD_LIBDEPS)
+ 	+$(LINKER_FOR_BUILD) $(BUILD_LINKERFLAGS) $(BUILD_LDFLAGS) -o $@ \
+-	    $(filter-out $(BUILD_LIBDEPS), $^) $(BUILD_LIBS)
++	    $(filter-out $(BUILD_LIBDEPS), $^) $(BUILD_LIBS) \
++	    $(LIBINTL) $(LIBICONV)
+ 
+ omp-general.o: omp-device-properties.h
+ 
+-- 
+2.51.0
+
