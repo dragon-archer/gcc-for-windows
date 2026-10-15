@@ -58,6 +58,15 @@ jobs:
           compression-level: 0
           retention-days: 14
 
+      - name: Install built packages
+        run: pacman -U --noconfirm artifacts/packages/*.pkg.tar.*
+
+      - name: Run smoke tests
+        env:
+          COMBINATION: ${{ inputs.combination }}
+          ENVIRONMENT: ${{ matrix.environment }}
+        run: bash .github/scripts/run-tests.sh "$COMBINATION" "$ENVIRONMENT"
+
       - name: Collect configure and test logs
         if: always()
         run: |

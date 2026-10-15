@@ -33,7 +33,7 @@ jobs:
           platform: x86_64
           install-dir: C:\cygwin
           packages: >-
-            cygport gcc-core gcc-g++ gcc-fortran binutils make patch diffutils
+            cygport calm gcc-core gcc-g++ gcc-fortran binutils make patch diffutils
             tar xz gzip curl git autoconf automake libtool gettext-devel
             bison flex gperf texinfo python3 python3-devel
             libgmp-devel libmpfr-devel libmpc-devel libisl-devel
@@ -59,6 +59,18 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
+
+      - name: Install built packages
+        env:
+          CYGWIN_SETUP: ${{ steps.cygwin.outputs.setup }}
+        run: |
+          cd "$(cygpath -u "$GITHUB_WORKSPACE")"
+          bash .github/scripts/install-cygport.sh
+
+      - name: Run smoke tests
+        run: |
+          cd "$(cygpath -u "$GITHUB_WORKSPACE")"
+          bash .github/scripts/run-tests.sh "$COMBINATION" "$COMBINATION"
 
       - name: Collect cygport logs
         if: ${{ always() && steps.cygwin.outcome == 'success' }}
