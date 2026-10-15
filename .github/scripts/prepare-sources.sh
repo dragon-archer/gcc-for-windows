@@ -54,6 +54,7 @@ for combination in "${combinations[@]}"; do
       archive_dir=${repo_root}/work/archive-${combination}
       mkdir -p "${archive_dir}"
       mv "${source_dir}" "${archive_dir}/gcc-${pkgver}"
+      rm -rf "${archive_dir}/gcc-${pkgver}/.github"
       printf 'GCC_PKGVER=%q\nGCC_BASEVER=%q\n' \
         "${pkgver}" "${basever}" > "${output_dir}/${combination}.env"
       echo "Compressing ${combination} sources with xz -T0 -1"
