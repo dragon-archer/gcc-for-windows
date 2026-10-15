@@ -49,7 +49,7 @@ for combination in "${combinations[@]}"; do
       elif [[ ! ${datestamp} =~ ^[0-9]{8}$ ]]; then
         datestamp=$(date -u -r "${source_dir}/gcc/BASE-VER" +%Y%m%d)
       fi
-      pkgver=${basever%%.*}.0.0+${datestamp}
+      pkgver=${basever}+${datestamp}
       bash .github/scripts/apply-patches.sh "${source_dir}" "${repo_root}/patches"
       archive_dir=${repo_root}/work/archive-${combination}
       mkdir -p "${archive_dir}"
