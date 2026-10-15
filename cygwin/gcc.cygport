@@ -72,7 +72,7 @@ for hf in ${HOTFIXES} ; do
 "
 done
 #
-DISABLE_BOOTSTRAP=1
+#DISABLE_BOOTSTRAP=1
 defined DISABLE_BOOTSTRAP &&
     inform "Disable Bootstrapping."
 #DISABLE_LIBGCCJIT=1
@@ -205,7 +205,7 @@ src_compile() {
             cygconf # CYGCONF_ARGS defined above
     # make hangs after finishing everything on x86_64?
     #cygmake BOOT_CFLAGS="${CXXFLAGS}"
-    cygmake BOOT_CFLAGS="${CXXFLAGS}"
+    cygmake
 }
 
 # override default src_test, as we need to ignore failures and
