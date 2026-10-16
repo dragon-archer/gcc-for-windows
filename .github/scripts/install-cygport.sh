@@ -16,6 +16,4 @@ while IFS= read -r hint; do
   packages+=("${package}")
 done < <(find "${repository}/x86_64/release" -name '*.hint' ! -name '*-src.hint' ! -name '*-debuginfo-*.hint')
 package_list=$(IFS=,; echo "${packages[*]}")
-"$(cygpath -u "${CYGWIN_SETUP}")" --quiet-mode --local-install --no-verify \
-  --root "$(cygpath -w /)" --local-package-dir "$(cygpath -w "${repository}")" \
-  --site "file:///$(cygpath -m "${repository}")" --packages "${package_list}" | tee artifacts/logs/setup.log
+printf '%s\n' "${package_list}" > "${repository}/packages.txt"

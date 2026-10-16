@@ -60,12 +60,17 @@ jobs:
           compression-level: 0
           retention-days: 14
 
-      - name: Install built packages
-        env:
-          CYGWIN_SETUP: ${{ steps.cygwin.outputs.setup }}
+      - name: Prepare local repository
         run: |
           cd "$(cygpath -u "$GITHUB_WORKSPACE")"
           bash .github/scripts/install-cygport.sh
+
+      - name: Install built packages
+        shell: cmd
+        env:
+          CYGWIN_SETUP: ${{ steps.cygwin.outputs.setup }}
+          CYGWIN_ROOT: C:\cygwin
+        run: call .github\scripts\install-cygport.bat
 
       - name: Run smoke tests
         run: |
