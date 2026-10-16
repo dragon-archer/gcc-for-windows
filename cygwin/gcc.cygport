@@ -149,6 +149,7 @@ src_unpack_hook() {
 # libssp: conflicts with builtin SSP
 # clocale=newlib: otherwise uses 'generic', which fails widechar recognition in libstdc++
 CYGCONF_ARGS="
+    --disable-werror
     --libexecdir=/usr/lib
     --with-gcc-major-version-only
     --enable-shared --enable-shared-libgcc --enable-static
