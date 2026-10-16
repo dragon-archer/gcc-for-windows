@@ -6,7 +6,9 @@ mkdir -p "${repository}/x86_64/release"
 cp -R artifacts/packages/. "${repository}/x86_64/release/"
 mksetupini --arch x86_64 --releasearea "${repository}" \
   --inifile "${repository}/x86_64/setup.ini" \
-  --okmissing depended-package --okmissing required-package
+  --disable-check missing-depended-package \
+  --disable-check missing-required-package \
+  --disable-check missing-build-depended-package
 packages=()
 while IFS= read -r hint; do
   package=${hint##*/}
