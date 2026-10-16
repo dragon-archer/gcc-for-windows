@@ -207,21 +207,8 @@ package_gcc-libs() {
   # All others: GPL-3.0-or-later WITH GCC-exception-3.1 AND GFDL-1.3-or-later
   license=('spdx:LGPL-2.1-or-later AND GPL-3.0-or-later WITH GCC-exception-3.1 AND GFDL-1.3-or-later')
 
-  cd ${srcdir}/build-MSYS
-  make -j1 -C $CHOST/libgcc DESTDIR=${pkgdir} install-shared
-  for lib in libgomp libstdc++-v3/src; do
-    make -j1 -C $CHOST/$lib DESTDIR=${pkgdir} install-toolexeclibLTLIBRARIES
-  done
-
-  make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-info
-  make -j1 -C $CHOST/libquadmath DESTDIR=${pkgdir} install-info
-
-  make -j1 DESTDIR=${pkgdir} install-target-libquadmath
-  make -j1 DESTDIR=${pkgdir} install-target-libatomic
-
-  rm -vf ${pkgdir}/*.dll
-  rm -rvf ${pkgdir}/usr/lib/
-  rm -rvf ${pkgdir}/usr/share/gcc-${_pkgver}
+  mkdir -p "${pkgdir}/usr/bin"
+  mv -v "${srcdir}/dest"/*.dll "${pkgdir}/usr/bin/"
 
   # Install GPL-3 + Runtime Library Exception + LGPL-2.1
   install -Dm644 "${srcdir}/gcc-${pkgver}/COPYING3" "${pkgdir}/usr/share/licenses/gcc-libs/COPYING3"
@@ -245,8 +232,9 @@ package_gcc() {
 
   make -j1 DESTDIR=${pkgdir} install
 
-  # remove all DLLs
-  rm -vf ${pkgdir}/usr/bin/*.dll
+  # DLLs goes into gcc-libs
+  mkdir -p "${srcdir}/dest"
+  mv -v ${pkgdir}/usr/bin/*.dll "${srcdir}/dest/"
 
   rm -vf ${pkgdir}/usr/lib/libiberty.a
   rm -vf ${pkgdir}/usr/share/info/{libgomp,libquadmath}.info
