@@ -1,0 +1,43 @@
+From https://gcc.gnu.org/pipermail/gcc-patches/2026-October/733683.html
+Fixes regression in MSYS2
+
+diff --git a/gcc/value-range.h b/gcc/value-range.h
+index 290ea4bb83c..5ac5f395adf 100644
+--- a/gcc/value-range.h
++++ b/gcc/value-range.h
+@@ -346,6 +346,7 @@ protected:
+   virtual void set (tree, tree, value_range_kind = VR_RANGE) override;
+   virtual bool contains_p (tree cst) const override;
+   irange (wide_int *, unsigned nranges, bool resizable);
++  irange (wide_int *, unsigned nranges, bool resizable, unsigned prec);
+ 
+    // In-place operators.
+   bool irange_contains_p (const irange &) const;
+@@ -1177,6 +1178,18 @@ irange::irange (wide_int *base, unsigned nranges, bool resizable)
+   set_undefined ();
+ }
+ 
++inline
++irange::irange (wide_int *base, unsigned nranges, bool resizable,
++		unsigned prec)
++  : vrange (VR_IRANGE),
++    m_resizable (resizable),
++    m_max_ranges (nranges),
++    m_bitmask (prec)
++{
++  m_base = base;
++  set_undefined ();
++}
++
+ // Constructors for int_range<>.
+ 
+ template<unsigned N, bool RESIZABLE>
+@@ -1202,7 +1215,7 @@ int_range<N, RESIZABLE>::int_range (tree min, tree max, value_range_kind kind)
+ 
+ template<unsigned N, bool RESIZABLE>
+ int_range<N, RESIZABLE>::int_range (tree type)
+-  : irange (m_ranges, N, RESIZABLE)
++  : irange (m_ranges, N, RESIZABLE, TYPE_PRECISION (type))
+ {
+   set_varying (type);
+ }
