@@ -1,0 +1,118 @@
+Changes vs original patch:
+1. Remove unrelated runstatedir in configure.
+2. Update comment in configure.ac
+3. GNU Make doesn't support `filter` with multiple %, use `or` instead
+4. Add ChangeLog
+5. Rebased onto "lto, mingw: Do not export symbols from some frontends [PR115300]"
+
+---
+
+From cb32c3a148910c736aa3cd89dcb31a1653ddb95b Mon Sep 17 00:00:00 2001
+From: Achim Gratz <Achim.Gratz@Stromeko.DE>
+Date: Sun, 25 Apr 2021 11:33:55 +0200
+Subject: [PATCH] Cygwin: enable libgccjit not just for MinGW
+
+ChangeLog:
+
+	* configure.ac (jit): Don't disable jit for Cygwin without
+	-enable-host-shared, like MinGW.
+	* configure: Regenerate.
+
+gcc/jit/ChangeLog:
+
+	* Make-lang.in: Treat Cygwin like MinGW.
+	(SHARED_PFX): New variable, default to lib, set to cyg for
+	Cygwin targets.
+
+Co-authored-by: Zhongteng Gui <dragon-archer@outlook.com>
+Signed-off-by: Zhongteng Gui <dragon-archer@outlook.com>
+---
+ configure            |  3 ++-
+ configure.ac         |  3 ++-
+ gcc/jit/Make-lang.in | 15 ++++++++++-----
+ 3 files changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/configure b/configure
+index 07f62a81bb9..440003de73f 100755
+--- a/configure
++++ b/configure
+@@ -10418,10 +10418,11 @@ $as_echo "$as_me: WARNING: some C libraries are required to build $language: $mi
+         esac
+ 
+         # Disable jit if -enable-host-shared not specified
+-        # but not if building for Mingw. All code in Windows
++        # but not if building for MinGW or Cygwin. All code in Windows
+         # is position independent code (PIC).
+         case $target in
+           *mingw*) ;;
++          *cygwin*) ;;
+           *)
+           case ${add_this_lang}:${language}:${host_shared} in
+             yes:jit:no)
+diff --git a/configure.ac b/configure.ac
+index cb5c4271090..1019837af14 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2567,10 +2567,11 @@ if test -d ${srcdir}/gcc; then
+         esac
+ 
+         # Disable jit if -enable-host-shared not specified
+-        # but not if building for Mingw. All code in Windows
++        # but not if building for MinGW or Cygwin. All code in Windows
+         # is position independent code (PIC).
+         case $target in
+           *mingw*) ;;
++          *cygwin*) ;;
+           *)
+           case ${add_this_lang}:${language}:${host_shared} in
+             yes:jit:no)
+diff --git a/gcc/jit/Make-lang.in b/gcc/jit/Make-lang.in
+index 5eeea22e180..0591955a9d8 100644
+--- a/gcc/jit/Make-lang.in
++++ b/gcc/jit/Make-lang.in
+@@ -44,8 +44,13 @@
+ LIBGCCJIT_MINOR_NUM = 0
+ LIBGCCJIT_RELEASE_NUM = 1
+ 
+-ifneq (,$(findstring mingw,$(target)))
+-LIBGCCJIT_FILENAME = libgccjit-$(LIBGCCJIT_VERSION_NUM).dll
++SHARED_PFX=lib
++ifneq (,$(filter %cygwin,$(target)))
++SHARED_PFX=cyg
++endif
++
++ifneq (,$(or $(findstring mingw,$(target)),$(filter %-cygwin,$(target))))
++LIBGCCJIT_FILENAME = $(SHARED_PFX)gccjit-$(LIBGCCJIT_VERSION_NUM).dll
+ LIBGCCJIT_IMPORT_LIB = libgccjit.dll.a
+ 
+ jit: $(LIBGCCJIT_FILENAME) \
+@@ -164,7 +169,7 @@ else
+ JIT_LDFLAGS = $(LDFLAGS)
+ endif
+ 
+-ifneq (,$(findstring mingw,$(target)))
++ifneq (,$(or $(findstring mingw,$(target)),$(filter %-cygwin,$(target))))
+ LIBGCCJIT_DEF_FILE = libgccjit.def
+ 
+ # Create import library
+@@ -208,7 +213,7 @@ $(LIBGCCJIT_FILENAME): $(jit_OBJS) \
+ 	@$(call LINK_PROGRESS,$(INDEX.jit),end)
+ 
+ # Create symlinks when not building for Windows
+-ifeq (,$(findstring mingw,$(target)))
++ifeq (,$(or $(findstring mingw,$(target)),$(filter %-cygwin,$(target))))
+ 
+ ifeq (,$(findstring darwin,$(host)))
+ # but only one level for Darwin, version info is embedded.
+@@ -394,7 +399,7 @@ jit.install-headers: installdirs
+ 	$(INSTALL_DATA) $(srcdir)/jit/libgccjit++.h \
+ 	  $(DESTDIR)$(includedir)/libgccjit++.h
+ 
+-ifneq (,$(findstring mingw,$(target)))
++ifneq (,$(or $(findstring mingw,$(target)),$(filter %-cygwin,$(target))))
+ jit.install-common: installdirs jit.install-headers
+ # Install import library
+ 	$(INSTALL_PROGRAM) $(LIBGCCJIT_IMPORT_LIB) \
+-- 
+2.56.0.windows.2
+

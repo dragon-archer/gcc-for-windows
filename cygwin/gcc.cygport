@@ -82,7 +82,6 @@ then
 else
     LIBGCCJIT=1
     PATCH_URI+="
-      0101-Cygwin-enable-libgccjit-not-just-for-MingW.patch
       0102-Cygwin-testsuite-fixes-for-libgccjit.patch
     "
     inform "Support for libgccjit enabled."
