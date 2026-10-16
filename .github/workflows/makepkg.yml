@@ -37,6 +37,16 @@ jobs:
           update: true
           install: base-devel git
 
+      - name: Enable staging repository
+        run: |
+          grep -qFx '[staging]' /etc/pacman.conf || sed -i '/^# \[staging\]/,/^$/ s|^# ||g' /etc/pacman.conf
+
+      - name: Update from staging
+        shell: bash
+        run: |
+          msys2 -c 'pacman --noconfirm -Suuy'
+          msys2 -c 'pacman --noconfirm -Suu'
+
       - name: Download prepared sources
         uses: actions/download-artifact@v4
         with:
@@ -60,6 +70,11 @@ jobs:
 
       - name: Install built packages
         run: pacman -U --noconfirm artifacts/packages/*.pkg.tar.*
+
+      - name: Compare packages with official repository
+        env:
+          COMBINATION: ${{ inputs.combination }}
+        run: bash .github/scripts/report-makepkg.sh "$COMBINATION"
 
       - name: Run smoke tests
         env:
