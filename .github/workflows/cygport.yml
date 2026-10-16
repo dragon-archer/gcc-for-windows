@@ -65,12 +65,22 @@ jobs:
           cd "$(cygpath -u "$GITHUB_WORKSPACE")"
           bash .github/scripts/install-cygport.sh
 
+      - name: Save official package baseline
+        run: |
+          cd "$(cygpath -u "$GITHUB_WORKSPACE")"
+          bash .github/scripts/report-cygport.sh snapshot
+
       - name: Install built packages
         shell: cmd
         env:
           CYGWIN_SETUP: ${{ steps.cygwin.outputs.setup }}
           CYGWIN_ROOT: C:\cygwin
         run: call .github\scripts\install-cygport.bat
+
+      - name: Compare installed packages
+        run: |
+          cd "$(cygpath -u "$GITHUB_WORKSPACE")"
+          bash .github/scripts/report-cygport.sh report
 
       - name: Run smoke tests
         run: |
