@@ -11,9 +11,8 @@ mksetupini --arch x86_64 --releasearea "${repository}" \
   --disable-check missing-build-depended-package
 packages=()
 while IFS= read -r hint; do
-  package=${hint##*/}
-  package=${package%-*.hint}
-  package=${package%-*}
+  package=${hint%/*}
+  package=${package##*/}
   packages+=("${package}")
 done < <(find "${repository}/x86_64/release" -name '*.hint' ! -name '*-src.hint' ! -name '*-debuginfo-*.hint')
 package_list=$(IFS=,; echo "${packages[*]}")
