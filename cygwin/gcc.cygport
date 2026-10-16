@@ -51,7 +51,6 @@ esac
 # patches re-created in cygwin-gcc/cygwin-17.0.0
 PATCH_URI="
   0001-Always-define-WIN32_LEAN_AND_MEAN-before-windows.h.patch
-  0002-add-m-no-align-vector-insn-option-for-i386.patch
   0003-Cygwin-use-SysV-ABI-on-x86_64.patch
   0004-Cygwin-add-dummy-pthread-tsaware-and-large-address-a.patch
   0005-Cygwin-handle-dllimport-properly-in-medium-model-V2.patch

@@ -111,7 +111,6 @@ source=(${_url}/${_sourcedir}.tar.xz{,.sig}
         0024-libgfortran-Guard-locale-restoration-for-formatted-I0.patch
         0025-libgfortran-Copy-LC_NUMERIC-string-for-formatted-IO.patch
         0140-gcc-diagnostic-color.patch
-        0200-add-m-no-align-vector-insn-option-for-i386.patch
         2001-fix-building-rust-on-mingw-w64.patch
         3001-fix-codeview-crashes.patch)
 sha256sums=('e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e'
@@ -130,7 +129,6 @@ sha256sums=('e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e'
             '976d14f803a211b19d9bf0169c08d4fde05af5cc18073f2fc8efc9a3cb17890a'
             'f591efc820a2c72aefb83179f7cbd3f4654231b68700486bd04ee32e2db61de5'
             'c94004dab1685a6fa9124de86aae742df4136a2e9ff5d5e1ad87ecdc35fbcef4'
-            '1484911163634f30324827619c873a6267b377abba0df8bbedfd128163c53ea4'
             'a411f59953553a3d01dd64c79b1acbb91eca092c4cb01bfd26b1c51c3eb798e8'
             'f21f9ab731e9cab8fd4ca8c289497f859ef7004e6fa0507877dc2559ac2071c3')
 validpgpkeys=(F3691687D867B81B51CE07D9BBE43771487328A9  # bpiotrowski@archlinux.org
@@ -174,15 +172,6 @@ prepare() {
   # based on https://github.com/BurntSushi/ripgrep/issues/94#issuecomment-261761687
   apply_patch_with_msg \
     0140-gcc-diagnostic-color.patch
-
-  # workaround for AVX misalignment issue for pass-by-value arguments
-  #   cf. https://github.com/msys2/MSYS2-packages/issues/1209
-  #   cf. https://sourceforge.net/p/mingw-w64/discussion/723797/thread/bc936130/
-  #  Issue is longstanding upstream at https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54412
-  #  Potential alternative: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=939559
-  # https://github.com/msys2/MINGW-packages/pull/8317#issuecomment-824548411
-  apply_patch_with_msg \
-    0200-add-m-no-align-vector-insn-option-for-i386.patch
 
   apply_patch_with_msg \
     2001-fix-building-rust-on-mingw-w64.patch

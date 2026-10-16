@@ -2,3 +2,5 @@
 
 1. Introduce `_pkgver` for the GCC version and use it instead of `pkgver` in the version-specific runtime library and executable paths.
    > Can be upstreamed on next cleanup.
+2. Drop `0200-add-m-no-align-vector-insn-option-for-i386.patch`
+   > Has been fixed upstream in r17-4650-g4a0bca2e9e9193
