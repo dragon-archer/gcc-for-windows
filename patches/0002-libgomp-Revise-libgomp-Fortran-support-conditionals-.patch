@@ -1,0 +1,102 @@
+From edef151785c95712448e6ab8622579260f7f317e Mon Sep 17 00:00:00 2001
+From: Thomas Schwinge <tschwinge@baylibre.com>
+Date: Tue, 13 Oct 2026 16:36:00 +0200
+Subject: [PATCH] libgomp: Revise libgomp/Fortran support conditionals: 'FC=no'
+ case
+
+As of commit e5efa9eff99da897f0bbd69455d8f7856985b2db
+"libgomp: Revise libgomp/Fortran support conditionals", we've got 'FC' set to
+'$GFORTRAN' also in case that '--enable-languages=fortran' isn't in effect.
+Explicitly set 'FC=no' in this case, so that we don't confuse libtool.
+
+	PR libgomp/41418
+	libgomp/
+	* configure.ac (FC): Set to 'no' if '--enable-languages=fortran'
+	isn't in effect.
+	* configure: Regenerate.
+
+Reported-by: LIU Hao <lh_mouse@126.com>
+---
+ libgomp/configure    | 22 ++++++++++++----------
+ libgomp/configure.ac | 22 ++++++++++++----------
+ 2 files changed, 24 insertions(+), 20 deletions(-)
+
+diff --git a/libgomp/configure b/libgomp/configure
+index 6ff3899df15..e9ca90a1b71 100755
+--- a/libgomp/configure
++++ b/libgomp/configure
+@@ -12265,7 +12265,17 @@ FCFLAGS="$FCFLAGS -L."
+ # We need gfortran to compile parts of the library
+ # We can't use AC_PROG_FC because it expects a fully working gfortran.
+ #AC_PROG_FC(gfortran)
+-FC="$GFORTRAN"
++# If '--enable-languages=fortran' isn't in effect, the 'GFORTRAN' passed by
++# the top-level build system isn't functional (executable doesn't exist).
++# Catch this case here, and set 'FC=no', so that we don't confuse libtool.
++case ,${enable_languages}, in
++  *,fortran,* )
++    FC=$GFORTRAN
++    ;;
++  * )
++    FC=no
++    ;;
++esac
+ ac_ext=${ac_fc_srcext-f}
+ ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
+ ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $ac_fcflags_srcext conftest.$ac_ext $LIBS >&5'
+@@ -15231,15 +15241,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
+ FCFLAGS="$FCFLAGS -Wall -L../libgfortran"
+ 
+-case ,${enable_languages}, in
+-  *,fortran,* )
+-   use_fortran=true
+-   ;;
+-  * )
+-   use_fortran=false
+-   ;;
+-esac
+- if "$use_fortran"; then
++ if test "$ac_cv_fc_compiler_gnu" = yes; then
+   USE_FORTRAN_TRUE=
+   USE_FORTRAN_FALSE='#'
+ else
+diff --git a/libgomp/configure.ac b/libgomp/configure.ac
+index 9ebac1fc336..744f9a357ec 100644
+--- a/libgomp/configure.ac
++++ b/libgomp/configure.ac
+@@ -159,19 +159,21 @@ FCFLAGS="$FCFLAGS -L."
+ # We need gfortran to compile parts of the library
+ # We can't use AC_PROG_FC because it expects a fully working gfortran.
+ #AC_PROG_FC(gfortran)
+-FC="$GFORTRAN"
++# If '--enable-languages=fortran' isn't in effect, the 'GFORTRAN' passed by
++# the top-level build system isn't functional (executable doesn't exist).
++# Catch this case here, and set 'FC=no', so that we don't confuse libtool.
++case ,${enable_languages}, in
++  *,fortran,* )
++    FC=$GFORTRAN
++    ;;
++  * )
++    FC=no
++    ;;
++esac
+ AC_PROG_FC(gfortran)
+ FCFLAGS="$FCFLAGS -Wall -L../libgfortran"
+ 
+-case ,${enable_languages}, in
+-  *,fortran,* )
+-   use_fortran=true
+-   ;;
+-  * )
+-   use_fortran=false
+-   ;;
+-esac
+-AM_CONDITIONAL([USE_FORTRAN], ["$use_fortran"])
++AM_CONDITIONAL([USE_FORTRAN], [test "$ac_cv_fc_compiler_gnu" = yes])
+ 
+ # For libtool versioning info, format is CURRENT:REVISION:AGE
+ libtool_VERSION=1:0:0
+-- 
+2.56.0.windows.2
+
