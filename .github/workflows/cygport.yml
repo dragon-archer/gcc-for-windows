@@ -63,7 +63,7 @@ jobs:
       - name: Prepare local repository
         run: |
           cd "$(cygpath -u "$GITHUB_WORKSPACE")"
-          bash .github/scripts/install-cygport.sh
+          bash .github/scripts/install-cygport.sh prepare
 
       - name: Save official package baseline
         run: |
@@ -71,11 +71,12 @@ jobs:
           bash .github/scripts/report-cygport.sh snapshot
 
       - name: Install built packages
-        shell: cmd
         env:
           CYGWIN_SETUP: ${{ steps.cygwin.outputs.setup }}
           CYGWIN_ROOT: C:\cygwin
-        run: call .github\scripts\install-cygport.bat
+        run: |
+          cd "$(cygpath -u "$GITHUB_WORKSPACE")"
+          bash .github/scripts/install-cygport.sh
 
       - name: Compare installed packages
         run: |

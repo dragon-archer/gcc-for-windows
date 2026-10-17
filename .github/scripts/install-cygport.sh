@@ -17,12 +17,12 @@ while IFS= read -r hint; do
 done < <(find "${repository}/x86_64/release" -name '*.hint' ! -name '*-src.hint' ! -name '*-debuginfo-*.hint')
 package_list=$(IFS=,; echo "${packages[*]}")
 printf '%s\n' "${package_list}" > "${repository}/packages.txt"
-setup_packages=()
-for package in "${packages[@]}"; do
-  case ${package} in
-    gcc-*|*-gcc-*|libgccjit*|*-libgccjit*|libgnat*|*-libgnat*)
-      setup_packages+=("${package}")
-      ;;
-  esac
-done
-printf '%s\n' "$(IFS=,; echo "${setup_packages[*]}")" > "${repository}/setup-packages.txt"
+if [[ ${1:-} == prepare ]]; then
+  exit 0
+fi
+mkdir -p artifacts/logs
+"$(cygpath -u "${CYGWIN_SETUP}")" \
+  --quiet-mode --local-install --no-verify --upgrade-also \
+  --root "${CYGWIN_ROOT}" --local-package-dir "$(cygpath -w "${repository}")" \
+  --site "file:///$(cygpath -m "${repository}")" --packages "${package_list}" \
+  2>&1 | tee artifacts/logs/setup.log
