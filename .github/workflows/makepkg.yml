@@ -42,10 +42,10 @@ jobs:
           grep -qFx '[staging]' /etc/pacman.conf || sed -i '/^# \[staging\]/,/^$/ s|^# ||g' /etc/pacman.conf
 
       - name: Update from staging
-        shell: bash
+        shell: cmd
         run: |
-          msys2 -c 'pacman --noconfirm -Suuy'
-          msys2 -c 'pacman --noconfirm -Suu'
+          msys2 -c "pacman --noconfirm -Suuy"
+          msys2 -c "pacman --noconfirm -Suu"
 
       - name: Download prepared sources
         uses: actions/download-artifact@v4
