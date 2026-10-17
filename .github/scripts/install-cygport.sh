@@ -20,7 +20,7 @@ printf '%s\n' "${package_list}" > "${repository}/packages.txt"
 setup_packages=()
 for package in "${packages[@]}"; do
   case ${package} in
-    gcc-core|gcc-g++|gcc-fortran|gcc-objc|gcc-objc++|gcc-ada|libgccjit0|libgnat*)
+    gcc-*|*-gcc-*|libgccjit*|*-libgccjit*|libgnat*|*-libgnat*)
       setup_packages+=("${package}")
       ;;
   esac
