@@ -47,9 +47,36 @@ jobs:
           path: work/sources
 
       - name: Build with cygport
+        id: build
         run: |
           cd "$(cygpath -u "$GITHUB_WORKSPACE")"
           bash .github/scripts/build-cygport.sh "$COMBINATION"
+
+      - name: Diagnose build directory locks
+        if: ${{ failure() && steps.build.outcome == 'failure' }}
+        shell: pwsh
+        run: |
+          $logDir = Join-Path $env:GITHUB_WORKSPACE 'artifacts/logs'
+          New-Item -ItemType Directory -Force $logDir | Out-Null
+          & {
+            Get-ChildItem 'C:\cygwin\gcc-build' -Directory | ForEach-Object {
+              $buildDir = Join-Path $_.FullName 'build'
+              foreach ($path in @($buildDir, "$buildDir\gcc", "$buildDir\stage1-gcc")) {
+                if (Test-Path $path) {
+                  Get-Item $path | Format-List FullName, Attributes
+                  Get-Acl $path | Format-List Path, Owner, AccessToString
+                }
+              }
+            }
+            Get-CimInstance Win32_Process |
+              Where-Object { $_.ExecutablePath -like '*gcc-build*' -or $_.Name -match '^(make|bash|sh|gcc|g\+\+|cc1.*|collect2|ld|as)\.exe$' } |
+              Format-List ProcessId, ParentProcessId, ExecutablePath, CommandLine
+            $archive = Join-Path $env:RUNNER_TEMP 'Handle.zip'
+            $tools = Join-Path $env:RUNNER_TEMP 'gfw-handle'
+            Invoke-WebRequest 'https://download.sysinternals.com/files/Handle.zip' -OutFile $archive
+            Expand-Archive $archive -DestinationPath $tools -Force
+            & "$tools\handle64.exe" -accepteula -nobanner gcc-build
+          } *>&1 | Tee-Object -FilePath "$logDir/build-locks.log"
 
       - name: Upload Cygwin packages
         uses: actions/upload-artifact@v4
