@@ -17,3 +17,12 @@ while IFS= read -r hint; do
 done < <(find "${repository}/x86_64/release" -name '*.hint' ! -name '*-src.hint' ! -name '*-debuginfo-*.hint')
 package_list=$(IFS=,; echo "${packages[*]}")
 printf '%s\n' "${package_list}" > "${repository}/packages.txt"
+setup_packages=()
+for package in "${packages[@]}"; do
+  case ${package} in
+    gcc-core|gcc-g++|gcc-fortran|gcc-objc|gcc-objc++|gcc-ada|libgccjit0|libgnat*)
+      setup_packages+=("${package}")
+      ;;
+  esac
+done
+printf '%s\n' "$(IFS=,; echo "${setup_packages[*]}")" > "${repository}/setup-packages.txt"
