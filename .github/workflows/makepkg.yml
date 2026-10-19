@@ -16,7 +16,7 @@ permissions:
 jobs:
   build:
     name: ${{ matrix.environment }}
-    runs-on: windows-2022
+    runs-on: windows-latest
     timeout-minutes: 360
     strategy:
       fail-fast: false
