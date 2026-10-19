@@ -23,11 +23,10 @@ if [[ ${combination} != msys2 ]]; then
 fi
 
 normalize_version() {
-  awk -v version="$1" '{
-    while ((position = index($0, version)) != 0)
-      $0 = substr($0, 1, position - 1) "PKGVER" substr($0, position + length(version));
-    print;
-  }'
+  local version=${1%%+*} path
+  while IFS= read -r path; do
+    printf '%s\n' "${path//"${version}"/PKGVER}"
+  done
 }
 
 for package_file in artifacts/packages/*.pkg.tar.*; do
