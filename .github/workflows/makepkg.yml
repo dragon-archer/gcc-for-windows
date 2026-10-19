@@ -62,7 +62,7 @@ jobs:
         run: bash .github/scripts/build-makepkg.sh "${COMBINATION}" "${ENVIRONMENT}"
 
       - name: Upload packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.combination }}-${{ matrix.environment }}-packages
           path: artifacts/packages/*.pkg.tar.*
@@ -97,7 +97,7 @@ jobs:
 
       - name: Upload logs and effective recipe
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.combination }}-${{ matrix.environment }}-logs
           path: artifacts/logs/
