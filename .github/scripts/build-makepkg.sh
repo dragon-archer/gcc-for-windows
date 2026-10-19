@@ -22,6 +22,7 @@ esac
 
 msys_root=$(cygpath -m /)
 build_dir=$(cygpath -u "${msys_root%%/*}/gcc-build")
+printf 'GFW_BUILD_ROOT=%s\n' "$(cygpath -m "${build_dir}")" >> "${GITHUB_ENV}"
 echo "Building in ${build_dir}; MSYS2 root: ${msys_root}"
 export PKGDEST=${repo_root}/artifacts/packages
 export LOGDEST=${repo_root}/artifacts/logs

@@ -56,10 +56,16 @@ jobs:
           path: work/sources
 
       - name: Prepare, build and package GCC
+        id: build
         env:
           COMBINATION: ${{ inputs.combination }}
           ENVIRONMENT: ${{ matrix.environment }}
         run: bash .github/scripts/build-makepkg.sh "${COMBINATION}" "${ENVIRONMENT}"
+
+      - name: Diagnose build directory locks
+        if: ${{ failure() && steps.build.outcome == 'failure' }}
+        shell: pwsh
+        run: .github/scripts/diagnose-build-locks.ps1
 
       - name: Upload packages
         uses: actions/upload-artifact@v7

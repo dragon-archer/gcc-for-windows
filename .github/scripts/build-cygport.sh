@@ -13,6 +13,7 @@ esac
 repo_root=$(pwd)
 source "${repo_root}/work/sources/${combination}.env"
 build_dir=/gcc-build
+printf 'GFW_BUILD_ROOT=%s\n' "$(cygpath -m "${build_dir}")" >> "${GITHUB_ENV}"
 mkdir -p "${build_dir}" "${repo_root}/artifacts/logs"
 cp -R "${repo_root}/${combination}/." "${build_dir}/"
 cp "${repo_root}/work/sources/${combination}.tar.xz" "${build_dir}/gcc-${GCC_PKGVER}.tar.xz"
