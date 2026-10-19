@@ -54,18 +54,25 @@ export TEST_COMBINATION=${combination} TEST_ENVIRONMENT=${environment}
 "${CC}" --version
 
 status=0
-test_scripts=("${test_root}"/*/test.sh)
+shopt -s nullglob
+test_scripts=("${test_root}"/*/test*.sh)
 set -f
 for test_script in "${test_scripts[@]}"; do
-  test_name=$(basename "$(dirname "${test_script}")")
+  test_dir=${test_script%/*}
+  test_name=${test_dir##*/}
+  test_case=${test_script##*/}
+  if [[ ${test_case} != test.sh ]]; then
+    test_case=${test_case#test-}
+    test_name+=/${test_case%.sh}
+  fi
   (
-    export TEST_DIR=${test_root}/${test_name} OUTPUT=${work_root}/${test_name}.exe
+    export TEST_DIR=${test_dir} OUTPUT=${work_root}/${test_name//\//-}.exe
     unset SOURCE
     source "${test_script}"
     if declare -F test_supported >/dev/null && ! test_supported; then
-      SOURCE=${test_root}/skip.c
+      SOURCE=${test_root}/00-sanity/skip.c
     fi
-    : "${SOURCE:?test.sh must set SOURCE}"
+    : "${SOURCE:?test script must set SOURCE}"
     if declare -F compile_test >/dev/null; then
       compile_test
     else
