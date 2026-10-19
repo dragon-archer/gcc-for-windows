@@ -86,7 +86,7 @@ Each combination has an independent, single-line `gcc-ref` file:
 Use a GCC snapshot identifier, for example:
 
 ```text
-16-20261010
+17-20261018
 ```
 
 To test a specific Git revision, prefix a full commit SHA or tag with `git:`:
@@ -99,7 +99,7 @@ Snapshots come from the GCC download server; Git archives come from
 [gcc-mirror/gcc](https://github.com/gcc-mirror/gcc). Push the updated reference
 or open a pull request to start a build.
 
-Snapshot package versions include the date, such as `16.0.0+20261010`.
+Snapshot package versions include the date, such as `17.0.0+20261018`.
 GCC's internal installation version remains controlled by the source and recipe.
 
 ## Recipes and Patches

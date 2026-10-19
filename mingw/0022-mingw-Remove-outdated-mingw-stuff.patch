@@ -20,17 +20,6 @@ local_include_dir is previously set to <prefix>/include in
 config/i386/x-mingw32, which forbids distributions to set their own
 local include dir, so we use the value from --with-local-prefix instead.
 
-Commit 5d571eaa95b9b3413287f46a183912b2445d7667 added -L and -isystem
-for x86_64-*mingw* and *-w64-mingw* to FLAGS_FOR_TARGET in configure.ac,
-this is no longer needed since /mingw symlink is not used anymore, and
-${prefix}/${target}/{lib,include} is always searched for all targets.
-
-ChangeLog:
-
-	PR target/126608
-	* configure.ac (FLAGS_FOR_TARGET): Do not add -L or -isystem for
-	x86_64-*mingw* and *-w64-mingw*.
-
 gcc/ChangeLog:
 
 	PR target/126608
@@ -47,32 +36,16 @@ gcc/ChangeLog:
 
 Signed-off-by: Zhongteng Gui <dragon-archer@outlook.com>
 ---
- configure.ac               |  4 +---
  gcc/config.gcc             |  2 --
  gcc/config/i386/x-mingw32  |  4 ----
  gcc/config/mingw/mingw32.h | 12 ++----------
- 4 files changed, 3 insertions(+), 19 deletions(-)
+ 3 files changed, 2 insertions(+), 16 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index c5de225b0ac..c81755ebbb6 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -3948,9 +3948,7 @@ esac
- 
- case "$target" in
-   x86_64-*mingw* | *-w64-mingw*)
--  # MinGW-w64 does not use newlib, nor does it use winsup. It may,
--  # however, use a symlink named 'mingw' in ${prefix} .
--    FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -L${prefix}/${target}/lib -L${prefix}/mingw/lib -isystem ${prefix}/${target}/include -isystem ${prefix}/mingw/include'
-+  # MinGW-w64 does not use newlib, nor does it use winsup. No special flags needed.
-     ;;
-   *-mingw*)
-   # MinGW can't be handled as Cygwin above since it does not use newlib.
 diff --git a/gcc/config.gcc b/gcc/config.gcc
 index 8fe99616f82..55339363c6c 100644
 --- a/gcc/config.gcc
 +++ b/gcc/config.gcc
-@@ -1331,7 +1331,6 @@ aarch64-*-mingw*)
+@@ -1342,7 +1342,6 @@ aarch64-*-mingw*)
  	tm_file="${tm_file} mingw/winnt-dll.h"
  	tmake_file="${tmake_file} aarch64/t-aarch64"
  	tmake_file="${tmake_file} aarch64/t-aarch64-mingw"
@@ -80,7 +53,7 @@ index 8fe99616f82..55339363c6c 100644
  	target_gtfiles="$target_gtfiles \$(srcdir)/config/mingw/winnt.cc"
  	target_gtfiles="$target_gtfiles \$(srcdir)/config/mingw/winnt-dll.cc"
  	extra_options="${extra_options} mingw/cygming.opt mingw/mingw.opt"
-@@ -2339,7 +2338,6 @@ i[34567]86-*-mingw* | x86_64-*-mingw*)
+@@ -2323,7 +2322,6 @@ i[34567]86-*-mingw* | x86_64-*-mingw*)
  			tmake_file="${tmake_file} i386/t-mingw-w32"
  			;;
  	esac
