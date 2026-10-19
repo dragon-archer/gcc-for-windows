@@ -99,13 +99,15 @@ jobs:
         run: |
           cd "$(cygpath -u "$GITHUB_WORKSPACE")"
           mkdir -p artifacts/logs
+          df -h / "$PWD" | tee artifacts/logs/disk-space.log
           for log in /var/log/setup.log /var/log/setup.log.full; do
             if [[ -f ${log} ]]; then
               cp "${log}" "artifacts/logs/setup-native-${log##*/}"
             fi
           done
-          if [[ -d /gcc-build ]]; then
-            find /gcc-build -type f \( -name '*.log' -o -name '*.sum' \) -print0 |
+          if [[ -n ${GFW_BUILD_ROOT:-} ]]; then
+            build_dir=$(cygpath -u "${GFW_BUILD_ROOT}")
+            find "${build_dir}" -type f \( -name '*.log' -o -name '*.sum' \) -print0 |
               tar --null -T - -czf artifacts/logs/cygport-diagnostics.tar.gz
           fi
 
