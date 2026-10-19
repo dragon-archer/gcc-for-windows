@@ -41,7 +41,7 @@ jobs:
             ${{ inputs.combination == 'cygwin' && 'gcc-ada=14.4.0-1' || 'mingw64-x86_64-binutils mingw64-x86_64-headers mingw64-x86_64-runtime mingw64-x86_64-winpthreads mingw64-x86_64-windows-default-manifest' }}
 
       - name: Download prepared sources
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: gcc-sources
           path: work/sources

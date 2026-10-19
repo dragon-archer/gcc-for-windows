@@ -50,7 +50,7 @@ jobs:
         run: msys2 -c "pacman --noconfirm -Suu"
 
       - name: Download prepared sources
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: gcc-sources
           path: work/sources
