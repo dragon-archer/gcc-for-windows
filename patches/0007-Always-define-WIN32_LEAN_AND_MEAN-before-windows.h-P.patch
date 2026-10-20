@@ -1,0 +1,128 @@
+From 08a22e9cdd51482e8ed9d53d15049548eec4bfe5 Mon Sep 17 00:00:00 2001
+From: Zhongteng Gui <dragon-archer@outlook.com>
+Date: Tue, 20 Oct 2026 17:13:33 +0800
+Subject: [PATCH] Always define `WIN32_LEAN_AND_MEAN` before <windows.h>
+ [PR108300]
+
+Another followup of r13-5055-g902c755930326c. Mostly regarding new code
+after that.
+
+	PR middle-end/108300
+
+libgfortran/ChangeLog:
+
+	* caf/shmem/shared_memory.c: Define `WIN32_LEAN_AND_MEAN` before
+	<windows.h>.
+	* caf/shmem/supervisor.c: Likewise.
+	* caf/shmem/thread_support.c: Likewise.
+
+libstdc++-v3/ChangeLog:
+
+	* src/c++23/print.cc: Define `WIN32_LEAN_AND_MEAN` before
+	<windows.h>.
+
+gcc/testsuite/ChangeLog:
+
+	* g++.dg/asan/sanitizer_test_utils.h: Define
+	`WIN32_LEAN_AND_MEAN` before <windows.h>.
+	* gcc.dg/di-sync-multithread.c: Likewise.
+	* objc-obj-c++-shared/GNUStep/GNUstepBase/GSConfig.h: Likewise.
+
+Signed-off-by: Zhongteng Gui <dragon-archer@outlook.com>
+---
+ gcc/testsuite/g++.dg/asan/sanitizer_test_utils.h                 | 1 +
+ gcc/testsuite/gcc.dg/di-sync-multithread.c                       | 1 +
+ gcc/testsuite/objc-obj-c++-shared/GNUStep/GNUstepBase/GSConfig.h | 1 +
+ libgfortran/caf/shmem/shared_memory.c                            | 1 +
+ libgfortran/caf/shmem/supervisor.c                               | 1 +
+ libgfortran/caf/shmem/thread_support.c                           | 1 +
+ libstdc++-v3/src/c++23/print.cc                                  | 1 +
+ 7 files changed, 7 insertions(+)
+
+diff --git a/gcc/testsuite/g++.dg/asan/sanitizer_test_utils.h b/gcc/testsuite/g++.dg/asan/sanitizer_test_utils.h
+index b118de1d346..2b6335b647f 100644
+--- a/gcc/testsuite/g++.dg/asan/sanitizer_test_utils.h
++++ b/gcc/testsuite/g++.dg/asan/sanitizer_test_utils.h
+@@ -15,6 +15,7 @@
+ 
+ #if defined(_WIN32)
+ // <windows.h> should always be the first include on Windows.
++# define WIN32_LEAN_AND_MEAN
+ # include <windows.h>
+ // MSVS headers define max/min as macros, so std::max/min gets crazy.
+ # undef max
+diff --git a/gcc/testsuite/gcc.dg/di-sync-multithread.c b/gcc/testsuite/gcc.dg/di-sync-multithread.c
+index 1a97df7a9e6..cb1aa00df85 100644
+--- a/gcc/testsuite/gcc.dg/di-sync-multithread.c
++++ b/gcc/testsuite/gcc.dg/di-sync-multithread.c
+@@ -11,6 +11,7 @@
+ #include <pthread.h>
+ #include <unistd.h>
+ #ifdef _WIN32
++#define WIN32_LEAN_AND_MEAN
+ #include <windows.h>
+ #endif
+ 
+diff --git a/gcc/testsuite/objc-obj-c++-shared/GNUStep/GNUstepBase/GSConfig.h b/gcc/testsuite/objc-obj-c++-shared/GNUStep/GNUstepBase/GSConfig.h
+index a0e7cc7a409..f7531c89f9f 100644
+--- a/gcc/testsuite/objc-obj-c++-shared/GNUStep/GNUstepBase/GSConfig.h
++++ b/gcc/testsuite/objc-obj-c++-shared/GNUStep/GNUstepBase/GSConfig.h
+@@ -307,6 +307,7 @@ typedef	struct {
+ #define WINVER Windows2000
+ #endif
+ 
++#define WIN32_LEAN_AND_MEAN
+ #if defined(__WIN64__)
+ #include <winsock2.h>
+ #include <windows.h>
+diff --git a/libgfortran/caf/shmem/shared_memory.c b/libgfortran/caf/shmem/shared_memory.c
+index f111e82da17..281336c80bc 100644
+--- a/libgfortran/caf/shmem/shared_memory.c
++++ b/libgfortran/caf/shmem/shared_memory.c
+@@ -38,6 +38,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ #ifdef HAVE_SYS_MMAN_H
+ #include <sys/mman.h>
+ #elif defined(WIN32)
++#define WIN32_LEAN_AND_MEAN
+ #include <windows.h>
+ #include <memoryapi.h>
+ #endif
+diff --git a/libgfortran/caf/shmem/supervisor.c b/libgfortran/caf/shmem/supervisor.c
+index 2e8f70c509f..617fae1c8b0 100644
+--- a/libgfortran/caf/shmem/supervisor.c
++++ b/libgfortran/caf/shmem/supervisor.c
+@@ -37,6 +37,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ #include <sys/wait.h>
+ #endif
+ #if !defined(_SC_PAGE_SIZE) && defined(WIN32)
++#define WIN32_LEAN_AND_MEAN
+ #include <windows.h>
+ #endif
+ #if defined(__hpux__)
+diff --git a/libgfortran/caf/shmem/thread_support.c b/libgfortran/caf/shmem/thread_support.c
+index f4b9f422dfa..2fb63324da0 100644
+--- a/libgfortran/caf/shmem/thread_support.c
++++ b/libgfortran/caf/shmem/thread_support.c
+@@ -78,6 +78,7 @@ initialize_shared_condition (caf_shmem_condvar *cond, const int)
+ #include "../caf_error.h"
+ #include "supervisor.h"
+ #include "teams_mgmt.h"
++#define WIN32_LEAN_AND_MEAN
+ #include <windows.h>
+ #include <assert.h>
+ 
+diff --git a/libstdc++-v3/src/c++23/print.cc b/libstdc++-v3/src/c++23/print.cc
+index a12c50bfb6a..6371c350984 100644
+--- a/libstdc++-v3/src/c++23/print.cc
++++ b/libstdc++-v3/src/c++23/print.cc
+@@ -44,6 +44,7 @@
+ # include <stdio.h>   // _fileno
+ # include <io.h>      // _get_osfhandle, _open_osfhandle, _write
+ # include <fcntl.h>   // _O_APPEND
++# define WIN32_LEAN_AND_MEAN
+ # include <windows.h> // GetLastError, WriteConsoleW
+ #elifdef _GLIBCXX_HAVE_UNISTD_H
+ # include <stdio.h>   // fileno
+-- 
+2.56.0.windows.2
+

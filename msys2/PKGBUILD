@@ -34,7 +34,6 @@ makedepends=(
 )
 options=('!emptydirs') # '!strip' 'debug')
 source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.xz
-        0001-Always-define-WIN32_LEAN_AND_MEAN-before-windows.h.patch
         0003-Cygwin-use-SysV-ABI-on-x86_64.patch
         0004-Cygwin-add-dummy-pthread-tsaware-and-large-address-a.patch
         0005-Cygwin-handle-dllimport-properly-in-medium-model-V2.patch
@@ -53,7 +52,6 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.xz
         0950-11.2.0-configure-msys2.patch
         0951-11.2.0-msys2-spec.patch)
 sha256sums=('e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e'
-            'ae993ebe11402172611a9fa1550e0611dfc212ab9250a3eaff1022342c9bde71'
             '40871b6750e393b7627dc039c3460b39894fb7bb2514c71b39a1f163fe8e3f30'
             'de93958671c8230c2df79f7da7c406d4e0dfc53e119e9cb04ca44b8a02806671'
             '10365122aa55cdc32c4ff502a14229cb50ddf2b6a4b70521665ef2d6cb182c5a'
@@ -90,7 +88,6 @@ prepare() {
 
   # Cygwin patches
   apply_patch_with_msg \
-    0001-Always-define-WIN32_LEAN_AND_MEAN-before-windows.h.patch \
     0003-Cygwin-use-SysV-ABI-on-x86_64.patch \
     0004-Cygwin-add-dummy-pthread-tsaware-and-large-address-a.patch \
     0005-Cygwin-handle-dllimport-properly-in-medium-model-V2.patch \
