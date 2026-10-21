@@ -1,6 +1,7 @@
 # Changes to [Cygwin's gcc.cygport](https://cygwin.com/cgit/cygwin-packages/gcc/tree/gcc.cygport)
 
 - Don't override BOOT_CFLAGS, use default `-g -O2`.
+- Enable `STAGE1_CFLAGS="-O2"` to speed up.
 - Add `--disable-werror` for now.
   > `__gnat_personality_seh0` in `gcc/ada/raise-gcc.c` triggered `-Wclobbered`.
 - Drop `0002-add-m-no-align-vector-insn-option-for-i386.patch`

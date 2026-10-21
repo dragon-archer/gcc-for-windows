@@ -184,7 +184,7 @@ build() {
     --enable-linker-build-id \
     --enable-libstdcxx-filesystem-ts
 
-  make
+  make -O STAGE1_CFLAGS="-O2"
 }
 
 #check() {

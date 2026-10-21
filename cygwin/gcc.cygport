@@ -204,7 +204,7 @@ src_compile() {
             cygconf # CYGCONF_ARGS defined above
     # make hangs after finishing everything on x86_64?
     #cygmake BOOT_CFLAGS="${CXXFLAGS}"
-    cygmake
+    cygmake STAGE1_CFLAGS="-O2"
 }
 
 # override default src_test, as we need to ignore failures and
