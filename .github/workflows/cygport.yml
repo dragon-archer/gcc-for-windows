@@ -21,6 +21,7 @@ jobs:
     env:
       CHERE_INVOKING: '1'
       COMBINATION: ${{ inputs.combination }}
+      CYGWIN_MIRROR: https://mirrors.kernel.org/sourceware/cygwin
     steps:
       - uses: actions/checkout@v7
         with:
@@ -32,6 +33,7 @@ jobs:
         with:
           platform: x86_64
           install-dir: C:\cygwin
+          site: ${{ env.CYGWIN_MIRROR }}
           packages: >-
             cygport calm gcc-core gcc-g++ gcc-fortran binutils make patch diffutils
             tar xz gzip curl git autoconf automake libtool gettext-devel
