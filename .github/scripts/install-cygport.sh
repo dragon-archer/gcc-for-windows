@@ -23,7 +23,7 @@ if [[ ${1:-} == prepare ]]; then
 fi
 mkdir -p artifacts/logs
 "$(cygpath -u "${CYGWIN_SETUP}")" \
-  --quiet-mode --local-install --no-verify --upgrade-also --only-site \
+  --quiet-mode --local-install --no-verify --upgrade-also --only-site --allow-test-packages \
   --root "${CYGWIN_ROOT}" --local-package-dir "$(cygpath -w "${repository}")" \
   --site "file:///$(cygpath -m "${repository}")" --packages "${package_list}" \
   2>&1 | tee artifacts/logs/setup.log
