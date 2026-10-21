@@ -10,8 +10,8 @@ Each test lives in a directory containing `test*.sh`. The script sets `SOURCE`,
 Related cases share a directory with named `test-*.sh` scripts.
 Each script runs independently;
 
-Suites and cases run in filename order. `00-sanity` runs first and covers both
-a successful program and the return-77 skip path.
+Suites and cases run in filename order. `00-sanity` runs first and covers
+successful C and C++ programs and the return-77 skip path.
 
 A test script may define `compile_test` to use a custom command. The runner
 selects `CC` and `CXX` from the packages just installed by CI, using explicit
@@ -30,5 +30,5 @@ compile_test() {
 Compilation must return zero. The resulting program must return zero to pass,
 77 to skip, and any other value to fail.
 
-CI builds, installs packages, and runs tests in separate steps. Test output is
+CI builds, installs the compiler, and runs tests in separate steps. Test output is
 saved in the logs artifact as `tests.log`.
