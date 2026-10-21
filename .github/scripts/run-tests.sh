@@ -30,6 +30,7 @@ case ${combination} in
 esac
 
 case ${combination}:${environment} in
+  ubuntu:x86_64-linux-gnu) CC=gcc; CXX=g++ ;;
   msys2:*) CC=/usr/bin/gcc; CXX=/usr/bin/g++ ;;
   mingw:*) CC=${MINGW_PREFIX}/bin/gcc; CXX=${MINGW_PREFIX}/bin/g++ ;;
   msys2-cross:mingw32) CC=/opt/bin/i686-w64-mingw32-gcc; CXX=/opt/bin/i686-w64-mingw32-g++ ;;
@@ -49,7 +50,7 @@ if [[ ${combination} == msys2-cross ]]; then
   target=${target%-gcc}
   export PATH=/opt/lib/gcc/${target}/${GCC_BASEVER}:${PATH}
 fi
-export CC CXX CFLAGS CXXFLAGS
+export CC CXX CFLAGS="${CFLAGS:-}" CXXFLAGS="${CXXFLAGS:-}"
 export TEST_COMBINATION=${combination} TEST_ENVIRONMENT=${environment}
 "${CC}" --version
 

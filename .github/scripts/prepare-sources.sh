@@ -6,7 +6,7 @@ mode=${1:?download or prepare is required}
 repo_root=$(pwd)
 cache_dir=${repo_root}/work/downloads
 output_dir=${repo_root}/work/sources
-combinations=(msys2 msys2-cross mingw cygwin cygwin-cross)
+combinations=(msys2 msys2-cross mingw cygwin cygwin-cross ubuntu)
 mkdir -p "${cache_dir}" "${output_dir}"
 declare -A prepared=()
 

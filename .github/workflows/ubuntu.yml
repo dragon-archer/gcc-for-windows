@@ -1,0 +1,57 @@
+name: Build GCC on Ubuntu
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: x86_64-linux-gnu
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            build-essential g++-multilib flex bison texinfo gettext \
+            libgmp-dev libmpfr-dev libmpc-dev libisl-dev zlib1g-dev libzstd-dev
+
+      - name: Download prepared sources
+        uses: actions/download-artifact@v8
+        with:
+          name: gcc-sources
+          path: work/sources
+
+      - name: Build and install GCC
+        run: bash ubuntu/build.sh
+
+      - name: Run smoke tests
+        run: bash .github/scripts/run-tests.sh ubuntu x86_64-linux-gnu
+
+      - name: Collect configure logs
+        if: always()
+        run: |
+          mkdir -p artifacts/logs
+          if [[ -d work/build-ubuntu ]]; then
+            find work/build-ubuntu -type f -name config.log -print0 \
+              | tar --null -T - -czf artifacts/logs/build-diagnostics.tar.gz
+          fi
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ubuntu-x86_64-linux-gnu-logs
+          path: artifacts/logs/
+          if-no-files-found: warn
+          retention-days: 14
