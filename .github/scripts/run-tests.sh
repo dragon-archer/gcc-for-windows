@@ -53,6 +53,7 @@ fi
 export CC CXX CFLAGS="${CFLAGS:-}" CXXFLAGS="${CXXFLAGS:-}"
 export TEST_COMBINATION=${combination} TEST_ENVIRONMENT=${environment}
 "${CC}" --version
+"${CC}" -x c++ /dev/null -E -v
 
 status=0
 shopt -s nullglob
