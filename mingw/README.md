@@ -8,3 +8,5 @@
   > Has been fixed upstream in r17-4650-g4a0bca2e9e9193
 - Regenerate `0022-mingw-Remove-outdated-mingw-stuff.patch`
   > Part of it has been fixed upstream in r17-5098-ga80b0de184f0f7
+- Drop `0007-Build-EXTRA_GNATTOOLS-for-Ada.patch`
+  > Has been fixed upstream in r17-5466-g736e07ca6a2a6c
