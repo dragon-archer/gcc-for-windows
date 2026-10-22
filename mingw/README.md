@@ -10,3 +10,5 @@
   > Part of it has been fixed upstream in r17-5098-ga80b0de184f0f7
 - Drop `0007-Build-EXTRA_GNATTOOLS-for-Ada.patch`
   > Has been fixed upstream in r17-5466-g736e07ca6a2a6c
+- Drop `0008-Prettify-linking-no-undefined.patch`
+  > No longer needed. Can be backported.
