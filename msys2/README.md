@@ -6,3 +6,5 @@
   > Has been fixed upstream in r17-4650-g4a0bca2e9e9193
 - Drop `0101-Cygwin-enable-libgccjit-not-just-for-MingW.patch`
   > Has been fixed upstream in r17-5417-gfbbe6708ef01b2
+- Drop `0001-Always-define-WIN32_LEAN_AND_MEAN-before-windows.h.patch`
+  > Has been fixed upstream in r17-5485-g49f3e5d51a00ac
