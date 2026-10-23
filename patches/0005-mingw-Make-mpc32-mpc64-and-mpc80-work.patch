@@ -1,0 +1,89 @@
+From b246ed50fbc1114f13bc67893fa7dc2e324b3b7c Mon Sep 17 00:00:00 2001
+From: Peter Damianov <peter0x44@disroot.org>
+Date: Wed, 21 Oct 2026 18:09:32 -0500
+Subject: [PATCH] mingw: Make -mpc32, -mpc64 and -mpc80 work
+
+On other x86 targets, -mpc32, -mpc64 and -mpc80 link crtprec32.o,
+crtprec64.o or crtprec80.o, whose constructor sets the x87 precision
+control.  The mingw-w64 targets accept the options but link nothing for
+them, so the options have no effect.
+
+The mingw-w64 runtime already chooses the x87 precision at link time.
+Program startup and fesetenv (FE_DFL_ENV) call _fpreset, and the
+_fpreset that is linked decides the precision: CRT_fp4.o sets 24 bits,
+CRT_fp8.o 53 bits and CRT_fp10.o 64 bits.  CRT_fp10.o is also in
+libmingw32.a, so it is the default.
+
+Link CRT_fp4.o, CRT_fp8.o or CRT_fp10.o for -mpc32, -mpc64 or -mpc80.
+They go in STARTFILE_SPEC so that they come before libmingw32.a.
+
+A DLL does not call _fpreset when it is loaded, so loading a DLL built
+with these options does not change the precision.  Only
+fesetenv (FE_DFL_ENV) called from the DLL uses it.
+
+Unlike on Linux, a new thread on Windows does not inherit the x87
+control word of the thread that created it.  Threads created with
+pthread_create still get the setting, because winpthreads passes the
+creating thread's floating-point environment to new threads.  Threads
+created with CreateThread or _beginthreadex start with the Windows
+default of 53-bit precision, as with MSVC.  Document this.
+
+gcc/ChangeLog:
+
+	* config/i386/mingw-w64.h (STARTFILE_SPEC): Link CRT_fp4.o,
+	CRT_fp8.o or CRT_fp10.o for -mpc32, -mpc64 or -mpc80.
+	* doc/invoke.texi (x86 Options): Describe -mpc32, -mpc64 and
+	-mpc80 on MinGW targets.
+
+Signed-off-by: Peter Damianov <peter0x44@disroot.org>
+Signed-off-by: Jonathan Yong <10walls@gmail.com>
+---
+ gcc/config/i386/mingw-w64.h | 7 +++++++
+ gcc/doc/invoke.texi         | 7 +++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/gcc/config/i386/mingw-w64.h b/gcc/config/i386/mingw-w64.h
+index 5d71aa5358f..7cd5e31b102 100644
+--- a/gcc/config/i386/mingw-w64.h
++++ b/gcc/config/i386/mingw-w64.h
+@@ -49,12 +49,19 @@ along with GCC; see the file COPYING3.  If not see
+    -lmingwex %{!mcrtdll=*:-lmsvcrt} %{mcrtdll=*:-l%*} \
+    -lkernel32 " MCFGTHREAD_SPEC
+ 
++/* For -mpc32, -mpc64 and -mpc80, link the mingw-w64 runtime's CRT_fp4.o,
++   CRT_fp8.o or CRT_fp10.o.  Each provides an _fpreset that sets the x87
++   precision; the CRT calls it at startup and from fesetenv (FE_DFL_ENV).
++   They must come before libmingw32.a, which contains CRT_fp10.o.  */
+ #undef STARTFILE_SPEC
+ #define STARTFILE_SPEC "%{shared|mdll:dllcrt2%O%s} \
+   %{!shared:%{!mdll:%{!municode:crt2%O%s}}} \
+   %{!shared:%{!mdll:%{municode:crt2u%O%s}}} \
+   %{pg:gcrt2%O%s} \
+   crtbegin.o%s \
++  %{mpc32:CRT_fp4.o%s} \
++  %{mpc64:CRT_fp8.o%s} \
++  %{mpc80:CRT_fp10.o%s} \
+   %{fvtable-verify=none:%s; \
+     fvtable-verify=preinit:vtv_start.o%s; \
+     fvtable-verify=std:vtv_start.o%s}"
+diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
+index 66d80f17e74..0e3ef381353 100644
+--- a/gcc/doc/invoke.texi
++++ b/gcc/doc/invoke.texi
+@@ -36679,6 +36679,13 @@ are enabled by default; routines in such libraries could suffer significant
+ loss of accuracy, typically through so-called ``catastrophic cancellation'',
+ when this option is used to set the precision to less than extended precision.
+ 
++On MinGW targets, the precision is set when the program starts and is
++restored by @code{fesetenv (FE_DFL_ENV)}.  Threads created with
++@code{pthread_create} inherit it from the creating thread, but threads
++created with @code{CreateThread} or @code{_beginthreadex} start with the
++Windows default of 53-bit precision.  Loading a DLL built with these
++options does not change the precision.
++
+ @opindex mdaz-ftz
+ @opindex mno-daz-ftz
+ @item -mdaz-ftz
+-- 
+2.56.0.windows.2
+
