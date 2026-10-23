@@ -12,3 +12,5 @@
   > Has been fixed upstream in r17-5466-g736e07ca6a2a6c
 - Drop `0008-Prettify-linking-no-undefined.patch`
   > No longer needed. Can be backported.
+- Drop `0011-Enable-shared-gnat-implib.patch`
+  > No longer needed. Can be backported.
