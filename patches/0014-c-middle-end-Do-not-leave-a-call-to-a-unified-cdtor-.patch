@@ -1,16 +1,19 @@
-From 8fc050dee79ada539e31440ef8a9640710c21b01 Mon Sep 17 00:00:00 2001
+From f39c7b556e7cf66c9aa39b884030e832f1aec8be Mon Sep 17 00:00:00 2001
 From: Iain Sandoe <iain@sandoe.co.uk>
 Date: Sun, 4 Oct 2026 17:16:36 +0200
 Subject: [PATCH] c++, middle-end: Do not leave a call to a unified cdtor body
  (C4) undefined
 
-For Darwin, At -Os, -fdeclone-ctor-dtor is enabled, which splits a cdtor into a
-unified body (C4) plus C1/C2 thunks.
+At -Os, -fdeclone-ctor-dtor is enabled, which splits a cdtor into a unified body (C4)
+plus C1/C2 thunks.
 
 A TU that inlines a thunk therefore materialises a call to a C4 whose own
 offline body is DECL_EXTERNAL and so emitted by nobody, and the link fails with
-an undefined reference.  libstdc++ supplies exactly that situation, since it is
-not built with -fdeclone-ctor-dtor.
+an undefined reference.
+
+This fires on targets without support for COMDAT or where ONE_ONLY decls are not
+marked as DECL_WEAK.  The solution is to decline the inline of such thunks if they
+would leave a reference to an un-emitted C4.
 
 	PR libstdc++/125359
 
@@ -37,14 +40,14 @@ gcc/testsuite/ChangeLog:
 Signed-off-by: Iain Sandoe <iain@sandoe.co.uk>
 ---
  gcc/cgraph.h                                 |  6 +-
- gcc/cp/optimize.cc                           | 10 +++
+ gcc/cp/optimize.cc                           | 12 ++++
  gcc/ipa-inline.cc                            | 14 ++++
  gcc/lto-cgraph.cc                            |  4 ++
  gcc/testsuite/g++.dg/opt/declone-cdtor-lto.C | 69 ++++++++++++++++++++
  gcc/testsuite/g++.dg/opt/declone6-aux.cc     |  8 +++
  gcc/testsuite/g++.dg/opt/declone6.C          | 61 +++++++++++++++++
  gcc/testsuite/g++.dg/opt/declone6.h          | 26 ++++++++
- 8 files changed, 197 insertions(+), 1 deletion(-)
+ 8 files changed, 199 insertions(+), 1 deletion(-)
  create mode 100644 gcc/testsuite/g++.dg/opt/declone-cdtor-lto.C
  create mode 100644 gcc/testsuite/g++.dg/opt/declone6-aux.cc
  create mode 100644 gcc/testsuite/g++.dg/opt/declone6.C
@@ -75,10 +78,19 @@ index d9f3d4815b0..a1dc5f3b99d 100644
       During WPA output it is used to mark nodes that are present in
       multiple partitions.  */
 diff --git a/gcc/cp/optimize.cc b/gcc/cp/optimize.cc
-index 0afeefd5704..718f29965c4 100644
+index 0afeefd5704..83a3d7ba804 100644
 --- a/gcc/cp/optimize.cc
 +++ b/gcc/cp/optimize.cc
-@@ -327,6 +327,16 @@ maybe_thunk_body (tree fn, bool force)
+@@ -295,6 +295,8 @@ maybe_thunk_body (tree fn, bool force)
+   DECL_ABSTRACT_P (fn) = false;
+   if (!DECL_WEAK (fn))
+     {
++      if (DECL_ONE_ONLY (fn))
++	symtab_node::get_create (fn)->no_external_definition = true;
+       TREE_PUBLIC (fn) = false;
+       DECL_EXTERNAL (fn) = false;
+       DECL_INTERFACE_KNOWN (fn) = true;
+@@ -327,6 +329,16 @@ maybe_thunk_body (tree fn, bool force)
        DECL_WEAK (fn) = false;
        DECL_COMDAT (fn) = false;
      }
