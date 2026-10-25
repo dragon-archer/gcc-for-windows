@@ -1,5 +1,5 @@
 pkgver=${GCC_PKGVER}
-pkgrel=1
+pkgrel=${GCC_PKGREL}
 _pkgver=${GCC_BASEVER}
 
 if [[ ${GCC_COMBINATION} == mingw ]]; then

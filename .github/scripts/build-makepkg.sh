@@ -9,6 +9,9 @@ combination_dir=${repo_root}/${GCC_COMBINATION}
 source_artifacts=${repo_root}/work/sources
 source "${source_artifacts}/${GCC_COMBINATION}.env"
 export GCC_PKGVER GCC_BASEVER
+shopt -s nullglob
+common_patches=("${repo_root}"/patches/*.patch)
+export GCC_PKGREL=${#common_patches[@]}
 
 case ${GCC_COMBINATION}:${GCC_ENVIRONMENT} in
   msys2:msys|msys2-cross:mingw32|msys2-cross:mingw64|msys2-cross:ucrt64)
