@@ -29,7 +29,7 @@ jobs:
 
       - name: Install Cygwin
         id: cygwin
-        uses: cygwin/cygwin-install-action@v6
+        uses: cygwin/cygwin-install-action@v7
         with:
           platform: x86_64
           install-dir: C:\cygwin
