@@ -1,0 +1,65 @@
+From e5d1e6c9c6dd6bc67ec8f81d10a93347a55159a7 Mon Sep 17 00:00:00 2001
+From: Christopher Wellons <wellons@nullprogram.com>
+Date: Thu, 22 Oct 2026 15:30:55 +0800
+Subject: [PATCH] libstdc++: Check for __cxa_thread_atexit for mingw crosses
+
+__cxa_thread_atexit isn't checked by default when cross compiling, so
+the fallback one is used, which has the wrong destruction order on
+mingw-w64.
+
+See also:
+https://github.com/msys2/MSYS2-packages/pull/6872
+https://github.com/msys2/msys2-tests/pull/101
+https://github.com/skeeto/w64devkit/pull/429
+
+libstdc++-v3/ChangeLog:
+
+	* configure: Regenerate.
+	* crossconfig.m4: Check for __cxa_thread_atexit for mingw
+	crosses.
+
+Reported-by: Christoph Reiter <reiter.christoph@gmail.com>
+Co-authored-by: Zhongteng Gui <dragon-archer@outlook.com>
+Signed-off-by: Zhongteng Gui <dragon-archer@outlook.com>
+---
+ libstdc++-v3/configure      | 11 +++++++++++
+ libstdc++-v3/crossconfig.m4 |  1 +
+ 2 files changed, 12 insertions(+)
+
+diff --git a/libstdc++-v3/configure b/libstdc++-v3/configure
+index b8eb29f4f0f..ffeaaefc704 100755
+--- a/libstdc++-v3/configure
++++ b/libstdc++-v3/configure
+@@ -45553,6 +45553,17 @@ if test "x$ac_cv_func__wfopen" = xyes; then :
+ #define HAVE__WFOPEN 1
+ _ACEOF
+ 
++fi
++done
++
++    for ac_func in __cxa_thread_atexit
++do :
++  ac_fn_c_check_func "$LINENO" "__cxa_thread_atexit" "ac_cv_func___cxa_thread_atexit"
++if test "x$ac_cv_func___cxa_thread_atexit" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
++#define HAVE___CXA_THREAD_ATEXIT 1
++_ACEOF
++
+ fi
+ done
+ 
+diff --git a/libstdc++-v3/crossconfig.m4 b/libstdc++-v3/crossconfig.m4
+index c94f5719075..f7c7a744da7 100644
+--- a/libstdc++-v3/crossconfig.m4
++++ b/libstdc++-v3/crossconfig.m4
+@@ -196,6 +196,7 @@ case "${host}" in
+     GLIBCXX_CHECK_STDLIB_SUPPORT
+     AC_CHECK_FUNCS(aligned_alloc posix_memalign memalign _aligned_malloc)
+     AC_CHECK_FUNCS(_wfopen)
++    AC_CHECK_FUNCS(__cxa_thread_atexit)
+     GCC_CHECK_TLS
+     ;;
+   *-netbsd* | *-openbsd*)
+-- 
+2.56.0.windows.2
+
