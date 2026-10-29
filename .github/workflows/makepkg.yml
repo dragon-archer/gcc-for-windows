@@ -31,23 +31,13 @@ jobs:
           persist-credentials: false
 
       - name: Set up MSYS2
-        uses: msys2/setup-msys2@v2
+        uses: msys2/setup-msys2@4d63254dd6db579251515fc8df913c4364bb37b0
+        env:
+          __SETUP_MSYS2_USE_STAGING: 'true'
         with:
           msystem: ${{ matrix.environment }}
           update: true
-          install: base-devel git
-
-      - name: Enable staging repository
-        run: |
-          grep -qFx '[staging]' /etc/pacman.conf || sed -i '/^# \[staging\]/,/^$/ s|^# ||g' /etc/pacman.conf
-
-      - name: Update from staging (core)
-        shell: cmd
-        run: msys2 -c "pacman --noconfirm -Suuy"
-
-      - name: Update from staging (rest)
-        shell: cmd
-        run: msys2 -c "pacman --noconfirm -Suu"
+          install: base-devel
 
       - name: Download prepared sources
         uses: actions/download-artifact@v8
