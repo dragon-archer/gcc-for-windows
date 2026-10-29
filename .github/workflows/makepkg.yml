@@ -31,7 +31,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up MSYS2
-        uses: msys2/setup-msys2@4d63254dd6db579251515fc8df913c4364bb37b0
+        uses: msys2/setup-msys2@dev
         env:
           __SETUP_MSYS2_USE_STAGING: 'true'
         with:
