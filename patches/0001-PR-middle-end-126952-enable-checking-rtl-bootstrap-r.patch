@@ -1,0 +1,73 @@
+From 4abcb017f2c77cde470050c49d12effcd378845a Mon Sep 17 00:00:00 2001
+From: Roger Sayle <roger@nextmovesoftware.com>
+Date: Tue, 10 Nov 2026 14:30:22 +0000
+Subject: [PATCH] PR middle-end/126952: --enable-checking=rtl bootstrap
+ regression
+
+This is the minimal fix to restore --enable-checking=rtl builds.
+Conceptually, wide-int has a simple invariant: if len is greater than
+zero, then the val field is well-defined, but if len is zero, val may
+be uninitialized.  Alas, wi::copy doesn't correctly defend against
+the case that len is zero, resulting in a "maybe used uninitialized"
+error during bootstrap.  Reducing a testcase is difficult, but the
+closest I can reduce looks something like:
+
+void foo(unsigned int len, int *ptr)
+{
+  int *undef;
+  int *val = len ? ptr : undef;
+  int i = 0;
+  do {
+    val[i]++;
+  } while (++i < len);
+}
+
+Notice that when len is zero, val's value is undefined and that this
+undefined pointer is unconditionally dereferenced.  This regression
+was exposed on mainline, by a change to thread backedges which peels
+the first iteration of the loop, revealing the path where val is
+always (obviously) undefined.  In reality, this analysis depends upon
+various inlining decisions, silencing the "maybe used uninitialized"
+when the logic is sufficiently complex.
+
+2026-11-10  Roger Sayle  <roger@nextmovesoftware.com>
+
+gcc/ChangeLog
+	PR middle-end/126952
+	* wide-int.h (wi::copy): Check that len is non-zero before
+	copying the contents of wide-int.
+
+Signed-off-by: Zhongteng Gui <dragon-archer@outlook.com>
+---
+ gcc/wide-int.h | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/gcc/wide-int.h b/gcc/wide-int.h
+index 59b2796ed95..41bf3418b20 100644
+--- a/gcc/wide-int.h
++++ b/gcc/wide-int.h
+@@ -2182,12 +2182,15 @@ inline void
+ wi::copy (T1 &x, const T2 &y)
+ {
+   unsigned int len = y.get_len ();
+-  HOST_WIDE_INT *xval = x.write_val (len);
+-  const HOST_WIDE_INT *yval = y.get_val ();
+-  unsigned int i = 0;
+-  do
+-    xval[i] = yval[i];
+-  while (++i < len);
++  if (len > 0)
++    {
++      HOST_WIDE_INT *xval = x.write_val (len);
++      const HOST_WIDE_INT *yval = y.get_val ();
++      unsigned int i = 0;
++      do
++        xval[i] = yval[i];
++      while (++i < len);
++    }
+   /* For widest_int write_val is called with an exact value, not
+      upper bound for len, so nothing is needed further.  */
+   if (!wi::int_traits <T1>::needs_write_val_arg)
+-- 
+2.56.0.windows.4
+
