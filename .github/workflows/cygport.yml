@@ -36,7 +36,7 @@ jobs:
           site: ${{ env.CYGWIN_MIRROR }}
           packages: >-
             cygport calm python3-devel tar xz gzip git
-            make patch diffutils autoconf automake libtool bison 'flex<2.6.5' texinfo
+            make patch diffutils autoconf automake libtool bison flex=2.6.4 texinfo
             libgmp-devel libmpfr-devel libmpc-devel libisl-devel
             zlib-devel libzstd-devel libiconv-devel libintl-devel gettext-devel
             gcc-core gcc-g++ binutils
