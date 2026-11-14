@@ -37,7 +37,7 @@ jobs:
         with:
           msystem: ${{ matrix.environment }}
           update: true
-          install: base-devel
+          install: base-devel flex bison
 
       - name: Download prepared sources
         uses: actions/download-artifact@v8

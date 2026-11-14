@@ -35,12 +35,15 @@ jobs:
           install-dir: C:\cygwin
           site: ${{ env.CYGWIN_MIRROR }}
           packages: >-
-            cygport calm gcc-core gcc-g++ gcc-fortran binutils make patch diffutils
-            tar xz gzip curl git autoconf automake libtool gettext-devel
-            bison flex gperf texinfo python3 python3-devel
+            cygport calm tar xz gzip git python3
+            make patch diffutils autoconf automake libtool bison flex texinfo
             libgmp-devel libmpfr-devel libmpc-devel libisl-devel
-            zlib-devel libzstd-devel libiconv-devel libintl-devel
-            ${{ inputs.combination == 'cygwin' && 'gcc-ada=14.4.0-1' || 'mingw64-x86_64-binutils mingw64-x86_64-headers mingw64-x86_64-runtime mingw64-x86_64-winpthreads mingw64-x86_64-windows-default-manifest' }}
+            zlib-devel libzstd-devel libiconv-devel libintl-devel gettext-devel
+            gcc-core gcc-g++ binutils
+            ${{ inputs.combination == 'cygwin' &&
+              'gcc-ada gcc-fortran' ||
+              'mingw64-x86_64-binutils mingw64-x86_64-headers mingw64-x86_64-runtime mingw64-x86_64-winpthreads mingw64-x86_64-windows-default-manifest'
+            }}
 
       - name: Download prepared sources
         uses: actions/download-artifact@v8
