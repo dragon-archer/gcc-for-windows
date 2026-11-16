@@ -1,5 +1,4 @@
-name: GCC build tests
-
+name: GCC Source and Build Pipeline
 on:
   push:
     branches: [main]

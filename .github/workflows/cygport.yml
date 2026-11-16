@@ -1,5 +1,4 @@
-name: Build Cygwin packages
-
+name: Cygwin Package Build Workflow
 on:
   workflow_call:
     inputs:

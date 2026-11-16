@@ -1,5 +1,4 @@
-name: Build GCC packages
-
+name: MSYS2/MinGW Package Build Workflow
 on:
   workflow_call:
     inputs:

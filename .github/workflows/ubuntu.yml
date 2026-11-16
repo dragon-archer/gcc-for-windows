@@ -1,4 +1,4 @@
-name: Build GCC on Ubuntu
+name: Ubuntu Build Workflow
 
 on:
   workflow_call:
