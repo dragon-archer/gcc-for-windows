@@ -11,7 +11,13 @@ mkdir -p "${cache_dir}" "${output_dir}"
 declare -A prepared=()
 
 for combination in "${combinations[@]}"; do
-  read -r ref < "${combination}/gcc-ref"
+  if [[ -f "${combination}/gcc-ref" ]]; then
+    echo "Using ${combination}/gcc-ref for ${combination}"
+    read -r ref < "${combination}/gcc-ref"
+  else
+    echo "Using shared gcc-ref for ${combination}"
+    read -r ref < gcc-ref
+  fi
   if [[ ${ref} =~ ^[0-9]+-[0-9]{8}$ ]]; then
     archive=gcc-${ref}.tar.xz
     url=https://gcc.gnu.org/pub/gcc/snapshots/${ref}/${archive}

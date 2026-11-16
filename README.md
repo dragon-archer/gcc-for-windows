@@ -86,16 +86,8 @@ shared smoke tests without using MSYS2 recipes or environment settings.
 
 ## Selecting GCC Sources
 
-Each combination has an independent, single-line `gcc-ref` file:
-
-| Combination | Source selection |
-| --- | --- |
-| MSYS2 native | [msys2/gcc-ref](msys2/gcc-ref) |
-| MSYS2 cross | [msys2-cross/gcc-ref](msys2-cross/gcc-ref) |
-| MinGW native | [mingw/gcc-ref](mingw/gcc-ref) |
-| Cygwin native | [cygwin/gcc-ref](cygwin/gcc-ref) |
-| Cygwin cross | [cygwin-cross/gcc-ref](cygwin-cross/gcc-ref) |
-| Ubuntu native | [ubuntu/gcc-ref](ubuntu/gcc-ref) |
+Each combination can use an independent, single-line `gcc-ref` file, or default
+to the shared `gcc-ref` in the root directory.
 
 Use a GCC snapshot identifier, for example:
 

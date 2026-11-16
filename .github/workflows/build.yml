@@ -22,7 +22,7 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           path: work/downloads
-          key: gcc-sources-v1-${{ hashFiles('*/gcc-ref') }}
+          key: gcc-sources-v1-${{ hashFiles('**/gcc-ref') }}
           restore-keys: gcc-sources-v1-
 
       - name: Download missing sources
