@@ -106,7 +106,6 @@ source=(
   0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
   0012-Handle-spaces-in-path-for-default-manifest.patch
   0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
-  0021-bootstrap-gnattools-Pass-target-sysroot-flags-to-boo.patch
   0024-libgfortran-Guard-locale-restoration-for-formatted-I0.patch
   0025-libgfortran-Copy-LC_NUMERIC-string-for-formatted-IO.patch
   0140-gcc-diagnostic-color.patch
@@ -119,7 +118,6 @@ sha256sums=('e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e'
             '3fc35067823f87e48dd3bfd265e7593000dc110fa9ad5f16c81b896765fc897a'
             'e98805ead7d78ee2a92f237894c4b2b7ddc1688e1b517d8c04f28d440202e40f'
             'fd9bdecb2bbc4796bbc9f00b708dac42ef9e3464a06d6d27e5475cee117de5be'
-            '8bce4158e1055151aebc962769644e8af88eabcfc80be6ef7c56aeeae18baacb'
             '976d14f803a211b19d9bf0169c08d4fde05af5cc18073f2fc8efc9a3cb17890a'
             'f591efc820a2c72aefb83179f7cbd3f4654231b68700486bd04ee32e2db61de5'
             'c94004dab1685a6fa9124de86aae742df4136a2e9ff5d5e1ad87ecdc35fbcef4'
@@ -156,7 +154,6 @@ prepare() {
   # Make GCC fully relocatable.
   # See https://github.com/msys2/MINGW-packages/pull/29280 for details.
   apply_patch_with_msg \
-    0021-bootstrap-gnattools-Pass-target-sysroot-flags-to-boo.patch \
     1000-MSYS2-Set-STANDARD_STARTFILE_PREFIX_1-to-lib.patch
 
   # Enable diagnostic color under mintty
