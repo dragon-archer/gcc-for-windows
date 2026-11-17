@@ -1,8 +1,8 @@
-From 21370bfb4c2d426d1749e8faf75f8a5beb7aca2b Mon Sep 17 00:00:00 2001
+From cdc9ff308eae2f8b83f430935b2cb1ea9df2898c Mon Sep 17 00:00:00 2001
 From: Zhongteng Gui <dragon-archer@outlook.com>
-Date: Fri, 7 Aug 2026 16:10:01 +0800
-Subject: [PATCH] bootstrap, gnattools: Pass target sysroot flags to bootstrap
- compilers
+Date: Tue, 17 Nov 2026 14:09:46 +0800
+Subject: [PATCH v2] bootstrap, gnattools: Pass target sysroot flags to
+ bootstrap compilers
 
 When --with-build-sysroot is used, most target compiler invocations
 receive SYSROOT_CFLAGS_FOR_TARGET through XGCC_FLAGS_FOR_TARGET.
@@ -22,30 +22,30 @@ Add SYSROOT_CFLAGS_FOR_TARGET to GCC_FOR_TARGET and the post-stage1 C++
 compiler.  Pass XGCC_FLAGS_FOR_TARGET to the compiler commands used by
 native and rebuilt gnattools.
 
+	PR bootstrap/126722
+
 ChangeLog:
 
-	PR bootstrap/126722
+	* Makefile.in: Regenerate.
 	* Makefile.tpl (POSTSTAGE1_CXX_EXPORT): Add
 	SYSROOT_CFLAGS_FOR_TARGET.
 	(GCC_FOR_TARGET): Likewise.
-	* Makefile.in: Regenerate.
 
 gnattools/ChangeLog:
 
-	PR bootstrap/126722
 	* Makefile.in (TOOLS_FLAGS_TO_PASS_NATIVE): Add
-	XGCC_FLAGS_FOR_TARGET to CC and CXX.
+	XGCC_FLAGS_FOR_TARGET to ADAC, CC and CXX.
 	(TOOLS_FLAGS_TO_PASS_RE): Likewise.
 
 Signed-off-by: Zhongteng Gui <dragon-archer@outlook.com>
 ---
- Makefile.in           | 3 ++-
- Makefile.tpl          | 3 ++-
- gnattools/Makefile.in | 8 ++++----
- 3 files changed, 8 insertions(+), 6 deletions(-)
+ Makefile.in           |  3 ++-
+ Makefile.tpl          |  3 ++-
+ gnattools/Makefile.in | 12 ++++++------
+ 3 files changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 110fa63c10c..74055159008 100644
+index dabe88d42c7..662cd1b1d69 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -266,6 +266,7 @@ POSTSTAGE1_CXX_EXPORT = \
@@ -56,7 +56,7 @@ index 110fa63c10c..74055159008 100644
  	  -L$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/src/.libs \
  	  -L$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/libsupc++/.libs"; \
  	  export CXX; \
-@@ -715,7 +716,7 @@ CC_FOR_TARGET=$(STAGE_CC_WRAPPER) @CC_FOR_TARGET@
+@@ -720,7 +721,7 @@ CC_FOR_TARGET=$(STAGE_CC_WRAPPER) @CC_FOR_TARGET@
  # variable is passed down to the gcc Makefile, where it is used to
  # build libgcc2.a.  We define it here so that it can itself be
  # overridden on the command line.
@@ -66,7 +66,7 @@ index 110fa63c10c..74055159008 100644
  RAW_CXX_FOR_TARGET=$(STAGE_CC_WRAPPER) @RAW_CXX_FOR_TARGET@
  GFORTRAN_FOR_TARGET=$(STAGE_CC_WRAPPER) @GFORTRAN_FOR_TARGET@
 diff --git a/Makefile.tpl b/Makefile.tpl
-index a5ff44e3dbc..8d2131846b8 100644
+index 83870fccccf..e89588b66d3 100644
 --- a/Makefile.tpl
 +++ b/Makefile.tpl
 @@ -269,6 +269,7 @@ POSTSTAGE1_CXX_EXPORT = \
@@ -77,7 +77,7 @@ index a5ff44e3dbc..8d2131846b8 100644
  	  -L$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/src/.libs \
  	  -L$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/libsupc++/.libs"; \
  	  export CXX; \
-@@ -622,7 +623,7 @@ CC_FOR_TARGET=$(STAGE_CC_WRAPPER) @CC_FOR_TARGET@
+@@ -627,7 +628,7 @@ CC_FOR_TARGET=$(STAGE_CC_WRAPPER) @CC_FOR_TARGET@
  # variable is passed down to the gcc Makefile, where it is used to
  # build libgcc2.a.  We define it here so that it can itself be
  # overridden on the command line.
@@ -87,31 +87,35 @@ index a5ff44e3dbc..8d2131846b8 100644
  RAW_CXX_FOR_TARGET=$(STAGE_CC_WRAPPER) @RAW_CXX_FOR_TARGET@
  GFORTRAN_FOR_TARGET=$(STAGE_CC_WRAPPER) @GFORTRAN_FOR_TARGET@
 diff --git a/gnattools/Makefile.in b/gnattools/Makefile.in
-index 98f1f75bdcc..14c74ea6c53 100644
+index aec880c4fd1..7f7bffe7ada 100644
 --- a/gnattools/Makefile.in
 +++ b/gnattools/Makefile.in
-@@ -81,8 +81,8 @@ CXX_LFLAGS = \
+@@ -80,9 +80,9 @@ CXX_LFLAGS = \
  
  # Variables for gnattools, native
  TOOLS_FLAGS_TO_PASS_NATIVE= \
+-	"ADAC=../../xgcc -B../../" \
 -	"CC=../../xgcc -B../../" \
 -	"CXX=../../xg++ -B../../ $(CXX_LFLAGS)" \
++	"ADAC=../../xgcc -B../../ $(XGCC_FLAGS_FOR_TARGET)" \
 +	"CC=../../xgcc -B../../ $(XGCC_FLAGS_FOR_TARGET)" \
 +	"CXX=../../xg++ -B../../ $(CXX_LFLAGS) $(XGCC_FLAGS_FOR_TARGET)" \
  	"CFLAGS=$(CFLAGS) $(WARN_CFLAGS) $(PICFLAG)" \
  	"LDFLAGS=$(LDFLAGS) $(LD_PICFLAG)" \
  	"ADAFLAGS=$(ADAFLAGS)" \
-@@ -99,8 +99,8 @@ TOOLS_FLAGS_TO_PASS_NATIVE= \
+@@ -99,9 +99,9 @@ TOOLS_FLAGS_TO_PASS_NATIVE= \
  
  # Variables for regnattools
  TOOLS_FLAGS_TO_PASS_RE= \
+-	"ADAC=../../xgcc -B../../" \
 -	"CC=../../xgcc -B../../" \
 -	"CXX=../../xg++ -B../../ $(CXX_LFLAGS)" \
++	"ADAC=../../xgcc -B../../ $(XGCC_FLAGS_FOR_TARGET)" \
 +	"CC=../../xgcc -B../../ $(XGCC_FLAGS_FOR_TARGET)" \
 +	"CXX=../../xg++ -B../../ $(CXX_LFLAGS) $(XGCC_FLAGS_FOR_TARGET)" \
  	"CFLAGS=$(CFLAGS) $(WARN_CFLAGS) $(PICFLAG)" \
  	"LDFLAGS=$(LDFLAGS) $(LD_PICFLAG)" \
  	"ADAFLAGS=$(ADAFLAGS)" \
 -- 
-2.55.0.windows.3
+2.56.1.windows.1
 
