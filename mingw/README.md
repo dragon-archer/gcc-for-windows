@@ -3,4 +3,5 @@
 - Import from https://github.com/msys2/MINGW-packages/pull/30935
 - Dropped all TO-DROP patches.
   > They are already applied for GCC 17.
-- Move `0021-bootstrap-gnattools-Pass-target-sysroot-flags-to-boo.patch` to common patches
+- Drop `0021-bootstrap-gnattools-Pass-target-sysroot-flags-to-boo.patch`
+  > Has been fixed upstream in r17-6361-g7cd316dfa1e1b7

@@ -1,8 +1,7 @@
-From d20bb2432e6c1276cf99a0ef4001d7f1db869ae2 Mon Sep 17 00:00:00 2001
+From 7cd316dfa1e1b716c2a9288284c1b18736019d45 Mon Sep 17 00:00:00 2001
 From: Zhongteng Gui <dragon-archer@outlook.com>
-Date: Tue, 17 Nov 2026 14:09:46 +0800
-Subject: [PATCH v3] bootstrap, gnattools: Pass target sysroot flags to
- bootstrap compilers
+Date: Tue, 17 Nov 2026 21:39:00 +0800
+Subject: [PATCH] Pass target sysroot flags to bootstrap compiler
 
 When --with-build-sysroot is used, most target compiler invocations
 receive SYSROOT_CFLAGS_FOR_TARGET through XGCC_FLAGS_FOR_TARGET.
@@ -14,27 +13,21 @@ Without these flags, configure tests performed in later bootstrap
 stages can fail to find the target headers or startup files, reporting
 that the C++ compiler cannot create executables.  Native gnattools can
 also invoke xg++ without the build sysroot when linking its programs,
-causing the target linker to fail to find crt2.o and
-default-manifest.o.
+causing the target linker to fail to find crt2.o and default-manifest.o.
 
 Add SYSROOT_CFLAGS_FOR_TARGET to GCC_FOR_TARGET and the post-stage1 C++
 compiler.  Pass XGCC_FLAGS_FOR_TARGET to the compiler commands used by
 native and rebuilt gnattools.
 
-	PR bootstrap/126722
-
-ChangeLog:
-
+        PR bootstrap/126722
+/
 	* Makefile.in: Regenerate.
 	* Makefile.tpl (POSTSTAGE1_CXX_EXPORT): Add
 	SYSROOT_CFLAGS_FOR_TARGET.
 	(GCC_FOR_TARGET): Likewise.
 
-gnattools/ChangeLog:
-
+gnattools/
 	* Makefile.in (CXX_LFLAGS): Add XGCC_FLAGS_FOR_TARGET.
-
-Signed-off-by: Zhongteng Gui <dragon-archer@outlook.com>
 ---
  Makefile.in           | 3 ++-
  Makefile.tpl          | 3 ++-
