@@ -1,48 +1,38 @@
-From cdc9ff308eae2f8b83f430935b2cb1ea9df2898c Mon Sep 17 00:00:00 2001
+From 7cd316dfa1e1b716c2a9288284c1b18736019d45 Mon Sep 17 00:00:00 2001
 From: Zhongteng Gui <dragon-archer@outlook.com>
-Date: Tue, 17 Nov 2026 14:09:46 +0800
-Subject: [PATCH v2] bootstrap, gnattools: Pass target sysroot flags to
- bootstrap compilers
+Date: Tue, 17 Nov 2026 21:39:00 +0800
+Subject: [PATCH] Pass target sysroot flags to bootstrap compiler
 
 When --with-build-sysroot is used, most target compiler invocations
 receive SYSROOT_CFLAGS_FOR_TARGET through XGCC_FLAGS_FOR_TARGET.
-GCC_FOR_TARGET and the post-stage1 C++ compiler are assembled
-separately, however, and therefore miss the configured sysroot.
-gnattools similarly constructs its native and rebuild CC and CXX
-commands directly.
+However, GCC_FOR_TARGET and the post-stage1 C++ compiler are assembled
+separately, and therefore miss the configured sysroot.  Similarly,
+gnattools constructs its native and rebuild CC and CXX commands directly.
 
 Without these flags, configure tests performed in later bootstrap
 stages can fail to find the target headers or startup files, reporting
 that the C++ compiler cannot create executables.  Native gnattools can
 also invoke xg++ without the build sysroot when linking its programs,
-causing the target linker to fail to find crt2.o and
-default-manifest.o.
+causing the target linker to fail to find crt2.o and default-manifest.o.
 
 Add SYSROOT_CFLAGS_FOR_TARGET to GCC_FOR_TARGET and the post-stage1 C++
 compiler.  Pass XGCC_FLAGS_FOR_TARGET to the compiler commands used by
 native and rebuilt gnattools.
 
-	PR bootstrap/126722
-
-ChangeLog:
-
+        PR bootstrap/126722
+/
 	* Makefile.in: Regenerate.
 	* Makefile.tpl (POSTSTAGE1_CXX_EXPORT): Add
 	SYSROOT_CFLAGS_FOR_TARGET.
 	(GCC_FOR_TARGET): Likewise.
 
-gnattools/ChangeLog:
-
-	* Makefile.in (TOOLS_FLAGS_TO_PASS_NATIVE): Add
-	XGCC_FLAGS_FOR_TARGET to ADAC, CC and CXX.
-	(TOOLS_FLAGS_TO_PASS_RE): Likewise.
-
-Signed-off-by: Zhongteng Gui <dragon-archer@outlook.com>
+gnattools/
+	* Makefile.in (CXX_LFLAGS): Add XGCC_FLAGS_FOR_TARGET.
 ---
- Makefile.in           |  3 ++-
- Makefile.tpl          |  3 ++-
- gnattools/Makefile.in | 12 ++++++------
- 3 files changed, 10 insertions(+), 8 deletions(-)
+ Makefile.in           | 3 ++-
+ Makefile.tpl          | 3 ++-
+ gnattools/Makefile.in | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
 index dabe88d42c7..662cd1b1d69 100644
@@ -87,35 +77,19 @@ index 83870fccccf..e89588b66d3 100644
  RAW_CXX_FOR_TARGET=$(STAGE_CC_WRAPPER) @RAW_CXX_FOR_TARGET@
  GFORTRAN_FOR_TARGET=$(STAGE_CC_WRAPPER) @GFORTRAN_FOR_TARGET@
 diff --git a/gnattools/Makefile.in b/gnattools/Makefile.in
-index aec880c4fd1..7f7bffe7ada 100644
+index aec880c4fd1..03746dea272 100644
 --- a/gnattools/Makefile.in
 +++ b/gnattools/Makefile.in
-@@ -80,9 +80,9 @@ CXX_LFLAGS = \
+@@ -76,7 +76,8 @@ CXX_LFLAGS = \
+  -B../../../$(target_noncanonical)/libstdc++-v3/src/.libs \
+  -B../../../$(target_noncanonical)/libstdc++-v3/libsupc++/.libs \
+  -L../../../$(target_noncanonical)/libstdc++-v3/src/.libs \
+- -L../../../$(target_noncanonical)/libstdc++-v3/libsupc++/.libs
++ -L../../../$(target_noncanonical)/libstdc++-v3/libsupc++/.libs \
++ $(XGCC_FLAGS_FOR_TARGET)
  
  # Variables for gnattools, native
  TOOLS_FLAGS_TO_PASS_NATIVE= \
--	"ADAC=../../xgcc -B../../" \
--	"CC=../../xgcc -B../../" \
--	"CXX=../../xg++ -B../../ $(CXX_LFLAGS)" \
-+	"ADAC=../../xgcc -B../../ $(XGCC_FLAGS_FOR_TARGET)" \
-+	"CC=../../xgcc -B../../ $(XGCC_FLAGS_FOR_TARGET)" \
-+	"CXX=../../xg++ -B../../ $(CXX_LFLAGS) $(XGCC_FLAGS_FOR_TARGET)" \
- 	"CFLAGS=$(CFLAGS) $(WARN_CFLAGS) $(PICFLAG)" \
- 	"LDFLAGS=$(LDFLAGS) $(LD_PICFLAG)" \
- 	"ADAFLAGS=$(ADAFLAGS)" \
-@@ -99,9 +99,9 @@ TOOLS_FLAGS_TO_PASS_NATIVE= \
- 
- # Variables for regnattools
- TOOLS_FLAGS_TO_PASS_RE= \
--	"ADAC=../../xgcc -B../../" \
--	"CC=../../xgcc -B../../" \
--	"CXX=../../xg++ -B../../ $(CXX_LFLAGS)" \
-+	"ADAC=../../xgcc -B../../ $(XGCC_FLAGS_FOR_TARGET)" \
-+	"CC=../../xgcc -B../../ $(XGCC_FLAGS_FOR_TARGET)" \
-+	"CXX=../../xg++ -B../../ $(CXX_LFLAGS) $(XGCC_FLAGS_FOR_TARGET)" \
- 	"CFLAGS=$(CFLAGS) $(WARN_CFLAGS) $(PICFLAG)" \
- 	"LDFLAGS=$(LDFLAGS) $(LD_PICFLAG)" \
- 	"ADAFLAGS=$(ADAFLAGS)" \
 -- 
 2.56.1.windows.1
 
