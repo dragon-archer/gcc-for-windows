@@ -1,0 +1,102 @@
+From 813d4df85dd9887d4038ca81760f90c9823e0cd4 Mon Sep 17 00:00:00 2001
+From: Zhongteng Gui <dragon-archer@outlook.com>
+Date: Sat, 21 Nov 2026 01:33:04 +0800
+Subject: [PATCH v2 3/4] mingw: Remove internal uses of -mthreads for MinGW
+ [PR127135]
+
+This is useless after previous commits.  Note that Lynx also uses
+-mthreads, and these are kept unchanged.  There's one more uses of
+-mthreads for MinGW in libgo/go/cmd/go/internal/work/exec.go, but from
+libgo/README.gcc, that file is maintained outside GCC, so I don't change
+it here.
+
+	PR target/127135
+
+config/ChangeLog:
+
+	* ax_pthread.m4: Update comment, -mthreads is only used by Lynx
+	now.
+
+gcc/ada/ChangeLog:
+
+	* libgnarl/s-osinte__mingw.ads: Remove -mthreads from
+	Linker_Options.
+
+gcc/ChangeLog:
+
+	* config/mingw/mingw32.h (GOMP_SELF_SPECS): Remove.  Same as
+	default after removing -mthreads.
+	(GTM_SELF_SPECS): Likewise.
+
+libgfortran/ChangeLog:
+
+	* configure: Regenerate.
+
+Signed-off-by: Zhongteng Gui <dragon-archer@outlook.com>
+---
+ config/ax_pthread.m4                 | 2 +-
+ gcc/ada/libgnarl/s-osinte__mingw.ads | 2 --
+ gcc/config/mingw/mingw32.h           | 7 -------
+ libgfortran/configure                | 2 +-
+ 4 files changed, 2 insertions(+), 11 deletions(-)
+
+diff --git a/config/ax_pthread.m4 b/config/ax_pthread.m4
+index 843e83c9bac..839cc1e2844 100644
+--- a/config/ax_pthread.m4
++++ b/config/ax_pthread.m4
+@@ -145,7 +145,7 @@ ax_pthread_flags="pthreads none -Kthread -pthread -pthreads -mthreads pthread --
+ #      -D_REENTRANT too), HP C (must be checked before -lpthread, which
+ #      is present but should not be used directly; and before -mthreads,
+ #      because the compiler interprets this as "-mt" + "-hreads")
+-# -mthreads: Mingw32/gcc, Lynx/gcc
++# -mthreads: Lynx/gcc
+ # pthread: Linux, etcetera
+ # --thread-safe: KAI C++
+ # pthread-config: use pthread-config program (for GNU Pth library)
+diff --git a/gcc/ada/libgnarl/s-osinte__mingw.ads b/gcc/ada/libgnarl/s-osinte__mingw.ads
+index 2099d833efa..52bfb329af0 100644
+--- a/gcc/ada/libgnarl/s-osinte__mingw.ads
++++ b/gcc/ada/libgnarl/s-osinte__mingw.ads
+@@ -50,8 +50,6 @@ with System.Win32;
+ package System.OS_Interface is
+    pragma Preelaborate;
+ 
+-   pragma Linker_Options ("-mthreads");
+-
+    subtype int  is Interfaces.C.int;
+    subtype long is Interfaces.C.long;
+ 
+diff --git a/gcc/config/mingw/mingw32.h b/gcc/config/mingw/mingw32.h
+index a4c4c132709..45038da6ef6 100644
+--- a/gcc/config/mingw/mingw32.h
++++ b/gcc/config/mingw/mingw32.h
+@@ -264,13 +264,6 @@ do {						         \
+ #undef WINT_TYPE
+ #define WINT_TYPE "short unsigned int"
+ 
+-/* mingw32 uses the  -mthreads option to enable thread support.  */
+-#undef GOMP_SELF_SPECS
+-#define GOMP_SELF_SPECS "%{fopenacc|fopenmp|%:gt(%{ftree-parallelize-loops=*:%*} 1): " \
+-			"-mthreads -pthread}"
+-#undef GTM_SELF_SPECS
+-#define GTM_SELF_SPECS "%{fgnu-tm:-mthreads -pthread}"
+-
+ /* mingw32 atexit function is safe to use in shared libraries.  Use it
+    to register C++ static destructors.  */
+ #define TARGET_CXX_USE_ATEXIT_FOR_CXA_ATEXIT hook_bool_void_true
+diff --git a/libgfortran/configure b/libgfortran/configure
+index 3e3e68a46b7..c4a74e56d23 100755
+--- a/libgfortran/configure
++++ b/libgfortran/configure
+@@ -17899,7 +17899,7 @@ ax_pthread_flags="pthreads none -Kthread -pthread -pthreads -mthreads pthread --
+ #      -D_REENTRANT too), HP C (must be checked before -lpthread, which
+ #      is present but should not be used directly; and before -mthreads,
+ #      because the compiler interprets this as "-mt" + "-hreads")
+-# -mthreads: Mingw32/gcc, Lynx/gcc
++# -mthreads: Lynx/gcc
+ # pthread: Linux, etcetera
+ # --thread-safe: KAI C++
+ # pthread-config: use pthread-config program (for GNU Pth library)
+-- 
+2.56.1.windows.1
+

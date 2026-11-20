@@ -1,0 +1,86 @@
+From 33dde83912fd4efaefb8984e8d38af23085aebb7 Mon Sep 17 00:00:00 2001
+From: Zhongteng Gui <dragon-archer@outlook.com>
+Date: Fri, 20 Nov 2026 18:05:33 +0800
+Subject: [PATCH v2 1/4] mingw: Remove -lmingwthrd from spec [PR127135]
+
+libmingwthrd.a is always an empty library since the start of mingw-w64.
+
+On the original MinGW.org, libmingwthrd.a contains _CRT_MT=1, and in
+libmingw32.a there's both _CRT_MT=0 and _CRT_MT=2, in 2 object files.
+However, __dyn_tls_init will always rewrite _CRT_MT to 2 at startup, so
+-lmingwthrd is even useless on MinGW.org.
+
+	PR target/127135
+
+gcc/ChangeLog:
+
+	* config/i386/mingw-w64.h (REAL_LIBGCC_SPEC): Remove -lmingwthrd.
+	* config/mingw/mingw32.h (REAL_LIBGCC_SPEC): Likewise.
+	* doc/invoke.texi: Update documentation for -mthreads option.
+
+libgcc/ChangeLog:
+
+	* config/i386/t-mingw32: Remove -lmingwthrd.
+
+Signed-off-by: Zhongteng Gui <dragon-archer@outlook.com>
+---
+ gcc/config/i386/mingw-w64.h  | 2 +-
+ gcc/config/mingw/mingw32.h   | 2 +-
+ gcc/doc/invoke.texi          | 6 +-----
+ libgcc/config/i386/t-mingw32 | 2 +-
+ 4 files changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/gcc/config/i386/mingw-w64.h b/gcc/config/i386/mingw-w64.h
+index 993793aa8b7..2d1747d8bb9 100644
+--- a/gcc/config/i386/mingw-w64.h
++++ b/gcc/config/i386/mingw-w64.h
+@@ -43,7 +43,7 @@ along with GCC; see the file COPYING3.  If not see
+ 
+ #undef REAL_LIBGCC_SPEC
+ #define REAL_LIBGCC_SPEC \
+-  "%{mthreads:-lmingwthrd} -lmingw32 \
++   "-lmingw32 \
+    " SHARED_LIBGCC_SPEC " \
+    -lmingwex %{!mcrtdll=*:-lmsvcrt} %{mcrtdll=*:-l%*} \
+    -lkernel32 " MCFGTHREAD_SPEC
+diff --git a/gcc/config/mingw/mingw32.h b/gcc/config/mingw/mingw32.h
+index 544e2526e90..a3f0113345c 100644
+--- a/gcc/config/mingw/mingw32.h
++++ b/gcc/config/mingw/mingw32.h
+@@ -195,7 +195,7 @@ along with GCC; see the file COPYING3.  If not see
+ #endif
+ #undef REAL_LIBGCC_SPEC
+ #define REAL_LIBGCC_SPEC \
+-  "%{mthreads:-lmingwthrd} -lmingw32 \
++   "-lmingw32 \
+    " SHARED_LIBGCC_SPEC " \
+    %{mcrtdll=crtdll*:-lcoldname} %{!mcrtdll=crtdll*:-lmoldname} \
+    -lmingwex %{!mcrtdll=*:-lmsvcrt} %{mcrtdll=*:-l%*} \
+diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
+index 5284996177d..11afa8cfe58 100644
+--- a/gcc/doc/invoke.texi
++++ b/gcc/doc/invoke.texi
+@@ -25933,11 +25933,7 @@ specifies that the @code{dllimport} attribute should be ignored.
+ 
+ @opindex mthreads
+ @item -mthreads
+-Support thread-safe exception handling on MinGW.  Programs that rely
+-on thread-safe exception handling must compile and link all code with the
+-@option{-mthreads} option.  When compiling, @option{-mthreads} defines
+-@option{-D_MT}; when linking, it links in a special thread helper library
+-@option{-lmingwthrd} which cleans up per-thread exception-handling data.
++This is an legacy option for MinGW.  It is useless now.
+ 
+ @opindex municode
+ @opindex mno-unicode
+diff --git a/libgcc/config/i386/t-mingw32 b/libgcc/config/i386/t-mingw32
+index bfdef6723ce..8068cd492be 100644
+--- a/libgcc/config/i386/t-mingw32
++++ b/libgcc/config/i386/t-mingw32
+@@ -1,2 +1,2 @@
+ # MinGW-specific parts of LIB_SPEC
+-SHLIB_LC = -lmingwthrd -lmingw32 -lmingwex -lmoldname -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32
++SHLIB_LC = -lmingw32 -lmingwex -lmoldname -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32
+-- 
+2.56.1.windows.1
+
