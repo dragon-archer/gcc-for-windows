@@ -76,9 +76,15 @@ jobs:
           bash .github/scripts/install-cygport.sh prepare
 
       - name: Save official package baseline
+        id: baseline
+        continue-on-error: true
         run: |
           cd "$(cygpath -u "$GITHUB_WORKSPACE")"
           bash .github/scripts/report-cygport.sh snapshot
+
+      - name: Warn when official package baseline is unavailable
+        if: ${{ steps.baseline.outcome == 'failure' }}
+        run: echo "::warning::Failed to save the official package baseline; skipping package comparison."
 
       - name: Install built packages
         env:
@@ -89,6 +95,7 @@ jobs:
           bash .github/scripts/install-cygport.sh
 
       - name: Compare installed packages
+        if: ${{ steps.baseline.outcome == 'success' }}
         run: |
           cd "$(cygpath -u "$GITHUB_WORKSPACE")"
           bash .github/scripts/report-cygport.sh report
