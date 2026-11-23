@@ -1,0 +1,85 @@
+From a79b971e9d919a8fb11b480022a7184619594f98 Mon Sep 17 00:00:00 2001
+From: Zhongteng Gui <dragon-archer@outlook.com>
+Date: Sat, 21 Nov 2026 01:28:13 +0800
+Subject: [PATCH v2 2/4] mingw: Always define _MT [PR127135]
+
+Some legacy code still relies on this to indicate that the code is
+thread safe. And MSVC still defines it, like _INTEGRAL_MAX_BITS.
+
+Also update comments, as i386/crtdll.h no longer exists.
+
+	PR target/127135
+
+gcc/ChangeLog:
+
+	* config/aarch64/cygming.h (TARGET_OS_CPP_BUILTINS): Always
+	define _MT.
+	* config/i386/mingw-w64.h (CPP_SPEC): Remove conditional -D_MT.
+	* config/mingw/mingw32.h (CPP_SPEC): Likewise.
+	(EXTRA_OS_CPP_BUILTINS): Always define _MT.  Update comments.
+
+Signed-off-by: Zhongteng Gui <dragon-archer@outlook.com>
+---
+ gcc/config/aarch64/cygming.h | 1 +
+ gcc/config/i386/mingw-w64.h  | 2 +-
+ gcc/config/mingw/mingw32.h   | 8 ++++----
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/gcc/config/aarch64/cygming.h b/gcc/config/aarch64/cygming.h
+index bb3c750df69..561d57fa2ae 100644
+--- a/gcc/config/aarch64/cygming.h
++++ b/gcc/config/aarch64/cygming.h
+@@ -117,6 +117,7 @@ still needed for compilation.  */
+     {									\
+       builtin_define ("__MSVCRT__");					\
+       builtin_define ("__MINGW32__");					\
++      builtin_define ("_MT");						\
+       builtin_define ("_WIN32");					\
+       builtin_define_std ("WIN32");					\
+       builtin_define_std ("WINNT");					\
+diff --git a/gcc/config/i386/mingw-w64.h b/gcc/config/i386/mingw-w64.h
+index 2d1747d8bb9..a12938ca17e 100644
+--- a/gcc/config/i386/mingw-w64.h
++++ b/gcc/config/i386/mingw-w64.h
+@@ -22,7 +22,7 @@ along with GCC; see the file COPYING3.  If not see
+ /* Enable -municode feature and support optional pthread support.  */
+ 
+ #undef CPP_SPEC
+-#define CPP_SPEC "%{posix:-D_POSIX_SOURCE} %{mthreads:-D_MT} " \
++#define CPP_SPEC "%{posix:-D_POSIX_SOURCE} " \
+ 		 "%{municode:-DUNICODE} " \
+ 		 "%{" SPEC_PTHREAD1 ":-D_REENTRANT} " \
+ 		 "%{mcrtdll=crtdll*:-U__MSVCRT__ -D__CRTDLL__} " \
+diff --git a/gcc/config/mingw/mingw32.h b/gcc/config/mingw/mingw32.h
+index a3f0113345c..a4c4c132709 100644
+--- a/gcc/config/mingw/mingw32.h
++++ b/gcc/config/mingw/mingw32.h
+@@ -42,13 +42,13 @@ along with GCC; see the file COPYING3.  If not see
+ #define DEFINE_THREAD_MODEL
+ #endif
+ 
+-/* See i386/crtdll.h for an alternative definition. _INTEGRAL_MAX_BITS
+-   is for compatibility with native compiler.  */
++/* _INTEGRAL_MAX_BITS and _MT are for compatibility with native compiler.  */
+ #define EXTRA_OS_CPP_BUILTINS()					\
+   do								\
+     {								\
+       builtin_define ("__MSVCRT__");				\
+-      builtin_define ("__MINGW32__");			   	\
++      builtin_define ("__MINGW32__");				\
++      builtin_define ("_MT");					\
+       builtin_define ("_WIN32");				\
+       builtin_define_std ("WIN32");				\
+       builtin_define_std ("WINNT");				\
+@@ -92,7 +92,7 @@ along with GCC; see the file COPYING3.  If not see
+ #define NATIVE_SYSTEM_HEADER_COMPONENT "MINGW"
+ 
+ #undef CPP_SPEC
+-#define CPP_SPEC "%{posix:-D_POSIX_SOURCE} %{mthreads:-D_MT} " \
++#define CPP_SPEC "%{posix:-D_POSIX_SOURCE} " \
+ 		 "%{" SPEC_PTHREAD1 ":-D_REENTRANT} " \
+ 		 "%{mcrtdll=crtdll*:-U__MSVCRT__ -D__CRTDLL__} " \
+ 		 "%{mcrtdll=msvcrt10*:-D__MSVCRT_VERSION__=0x100} " \
+-- 
+2.56.1.windows.1
+

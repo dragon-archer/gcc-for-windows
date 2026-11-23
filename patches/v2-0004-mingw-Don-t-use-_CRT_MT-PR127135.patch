@@ -1,0 +1,81 @@
+From e2df82dad5587bf75c8e7137dc7bafb67108ec27 Mon Sep 17 00:00:00 2001
+From: Zhongteng Gui <dragon-archer@outlook.com>
+Date: Sat, 21 Nov 2026 01:49:50 +0800
+Subject: [PATCH v2 4/4] mingw: Don't use _CRT_MT [PR127135]
+
+_CRT_MT is guaranteed to be non-zero, no matter with mingw-w64 or
+MinGW.org, so need to special case it.
+
+	PR target/127135
+
+libgcc/ChangeLog:
+
+	* config/i386/gthr-win32.h (MINGW32_SUPPORTS_MT_EH): Remove
+	declaration of _CRT_MT.
+	(__gthread_active_p): Always return 1.
+
+libphobos/ChangeLog:
+
+	* libdruntime/gcc/gthread.d: Sync with
+	libgcc/config/i386/gthr-win32.h
+
+Signed-off-by: Zhongteng Gui <dragon-archer@outlook.com>
+---
+ libgcc/config/i386/gthr-win32.h     |  8 --------
+ libphobos/libdruntime/gcc/gthread.d | 12 +-----------
+ 2 files changed, 1 insertion(+), 19 deletions(-)
+
+diff --git a/libgcc/config/i386/gthr-win32.h b/libgcc/config/i386/gthr-win32.h
+index 2c7504ef265..f820a8748f8 100644
+--- a/libgcc/config/i386/gthr-win32.h
++++ b/libgcc/config/i386/gthr-win32.h
+@@ -397,21 +397,13 @@ typedef struct {
+ 
+ #if defined (_WIN32) && !defined(__CYGWIN__)
+ #define MINGW32_SUPPORTS_MT_EH 1
+-/* Mingw runtime >= v0.3 provides a magic variable that is set to nonzero
+-   if -mthreads option was specified, or 0 otherwise. This is to get around
+-   the lack of weak symbols in PE-COFF.  */
+-extern int _CRT_MT;
+ extern int __mingwthr_key_dtor (unsigned long, void (*) (void *));
+ #endif /* _WIN32 && !__CYGWIN__ */
+ 
+ __GTHREAD_INLINE int
+ __gthread_active_p (void)
+ {
+-#ifdef MINGW32_SUPPORTS_MT_EH
+-  return _CRT_MT;
+-#else
+   return 1;
+-#endif
+ }
+ 
+ extern int __gthr_win32_create (__gthread_t *, void *(*) (void*), void *);
+diff --git a/libphobos/libdruntime/gcc/gthread.d b/libphobos/libdruntime/gcc/gthread.d
+index 61c09553c47..eab0acc743e 100644
+--- a/libphobos/libdruntime/gcc/gthread.d
++++ b/libphobos/libdruntime/gcc/gthread.d
+@@ -108,19 +108,9 @@ else static if (GNU_Thread_Model == ThreadModel.Win32)
+     enum GTHREAD_ONCE_INIT = __gthread_once_t(0, -1);
+     alias __gthread_key_t = c_ulong;
+ 
+-    version (MinGW)
+-    {
+-        // Mingw runtime >= v0.3 provides a magic variable that is set to nonzero
+-        // if -mthreads option was specified, or 0 otherwise.
+-        extern __gshared int _CRT_MT;
+-    }
+-
+     extern (D) int __gthread_active_p()
+     {
+-        version (MinGW)
+-            return _CRT_MT;
+-        else
+-            return 1;
++        return 1;
+     }
+ }
+ else
+-- 
+2.56.1.windows.1
+
